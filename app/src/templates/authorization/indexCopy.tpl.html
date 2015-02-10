@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Авторизация</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.min.css">
+    <!-- Custom styles for this template -->
+    <link href="<?php echo(Project::getBaseUrl()); ?>css/singin.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <form class="form-signin" role="form" action="<?php echo(Project::getBaseUrl()); ?>signin" method="post">
+        <label for="login" class="sr-only">login</label>
+        <input type="text" id="login" name="login" class="form-control" placeholder="login" required>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password"  required>
+        <?php if(!empty($captcha)):?>
+        <label for="captcha" class="sr-only">Captcha</label>
+        <div class="row" style="margin-bottom: 15px">
+            <div class="row">
+                <div class="col-xs-6" style="margin-left: 15px">
+                    <?php echo($captcha);?>
+                </div>
+                <div class="col-xs-5">
+                    <input type="text" name='captcha' class="form-control" placeholder="Captcha" required="">
+                </div>
+            </div>
+        </div>
+        <?php endif;?>
+        <?php if (!empty($error)):?>
+        <?php foreach($error as $k => $v) :?>
+        <div class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button class="close" data-dismiss="alert" type="button">
+                <span aria-hidden="true">×</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <?php echo($v);?>
+        </div>
+        <?php endforeach;?>
+        <?php endif;?>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Вход</button>
+    </form>
+</div>
+<!-- /container -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+<script src="http://getbootstrap.com/assets/js/docs.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

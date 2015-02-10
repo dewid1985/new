@@ -1,0 +1,190 @@
+<?php $partViewer->view('layouts/header'); ?>
+<?php $partViewer->view('menu/up_menu'); ?>
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Список статей</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <form id="search">
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    Поиск по :
+                </div>
+
+                <div class="panel-body">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="exampleInputName2">Заголовку</label>
+                            <input type="text" class="form-control" id="title" placeholder="Часть заголовка или слова через запятую">
+                        </div>
+                        <p></p>
+
+                        <div class="form-group">
+                            <label for="exampleInputName2">Аннонсу</label>
+                            <input type="text" class="form-control" id="anons" placeholder="Часть аннонса или слова через запятую">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputName2">Содержимому</label>
+                            <input type="text" class="form-control" id="text" placeholder="Часть содержимого или слова через запятую">
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="exampleInputName2">По дате создания</label>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6">
+                                            <div class="input-group date form_datetime" data-date=""
+                                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
+                                                <input id="of_created_at" class="form-control" size="16"
+                                                       name="published_at" type="text"
+                                                       readonly placeholder="от:">
+                                                <span class="input-group-addon"><span
+                                                        class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6">
+                                            <div class="input-group date form_datetime" data-date=""
+                                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
+                                                <input id="to_created_at" class="form-control" size="16"
+                                                       name="published_at" type="text"
+                                                       readonly placeholder="до:">
+                                                <span class="input-group-addon"><span
+                                                        class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputName2">По дате редактирования</label>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6">
+                                            <div class="input-group date form_datetime" data-date=""
+                                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
+                                                <input id="of_modified_at" class="form-control" size="16"
+                                                       name="published_at" type="text"
+                                                       readonly
+                                                       placeholder="от:">
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6">
+                                            <div class="input-group date form_datetime" data-date=""
+                                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
+                                                <input id="to_modified_at" class="form-control" size="16"
+                                                       name="published_at" type="text"
+                                                       readonly
+                                                       placeholder="до:">
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputName2">По дате публикации</label>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6">
+                                            <div class="input-group date form_datetime" data-date=""
+                                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
+                                                <input id="of_published_at" class="form-control" size="16"
+                                                       name="published_at" type="text"
+                                                       readonly
+                                                       placeholder="от:">
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6">
+                                            <div class="input-group date form_datetime" data-date=""
+                                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
+                                                <input id="to_published_at" class="form-control" size="16"
+                                                       name="published_at" type="text"
+                                                       readonly
+                                                       placeholder="до:">
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn btn-primary pull-right" type="submit" onclick="reloadDataAjax()">Поиск</div>
+                    <button class="btn btn-success pull-right" type="reset" style="margin-right: 5px;">Очистить все поля</button>
+                </div>
+
+            </div>
+        </form>
+    </div
+
+        <!-- /.row -->
+    <div class="row">
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                Cписок статей
+            </div>
+
+            <div class="panel-body">
+
+                <table id="articles" class="table table-striped" width="100%">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Загловок</th>
+                        <th>Автор</th>
+                        <th>Дата Создания</th>
+                        <th>Дата Редактирования</th>
+                        <th>Дата Публикации</th>
+                        <th></th>
+
+                    </tr>
+                    </thead>
+
+                    <tfoot>
+                    <tr>
+                        <th>id</th>
+                        <th>Загловок</th>
+                        <th>Автор</th>
+                        <th>Дата Создания</th>
+                        <th>Дата Редактирования</th>
+                        <th>Дата Публикации</th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.panel-body -->
+
+
+<?php $partViewer->view('layouts/footer'); ?>
