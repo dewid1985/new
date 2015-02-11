@@ -6,6 +6,9 @@
 
 class RubricsController extends ProjectAuthMappedController
 {
+    /**  */
+    use ResponseView;
+
     /** @var Module  */
     protected $module = null;
 
@@ -17,6 +20,15 @@ class RubricsController extends ProjectAuthMappedController
         if (is_null($this->module))
             $this->module = Module::create()->setModule(ModulesEnum::rubrics());
         return $this->module;
+    }
+
+
+    public function indexAction(HttpRequest $request)
+    {
+        return $this
+            ->getModelAndView(
+                ProjectResponseView::create()->setTpl('rubrics/index')
+            );
     }
 
 
@@ -48,13 +60,14 @@ class RubricsController extends ProjectAuthMappedController
      * Можно вернуть пустой массив если брать с учетом
      * что экшен будет тот который прописан в роут конфиге
      *
-     * @return mixed
+     * @return array
      */
     protected function /* array */
     getMapping()
     {
-        return array(
+        return [
+            'index' => 'indexAction',
             'getJsonRubric' => 'getJsonRubricAction'
-        );
+        ];
     }
 }

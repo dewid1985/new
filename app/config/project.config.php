@@ -29,6 +29,7 @@ return array(
             'resource' => '',
             'server' => ''
         ),
+
     ),
 //    'visitors' => array(
 //        'AddArticle' => array(

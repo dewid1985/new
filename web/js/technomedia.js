@@ -152,7 +152,7 @@ $('#articles tbody').on('click', 'button', function () {
 
 });
 
-var reloadDataAjax = function () {
+var reloadArticlesDataAjax = function () {
    articles.api().ajax.reload()
 };
 
@@ -208,7 +208,7 @@ $('#news tbody').on('click', 'button', function () {
 
 });
 
-var reloadDataAjax = function () {
+var reloadNewsDataAjax = function () {
    news.api().ajax.reload()
 };
 
