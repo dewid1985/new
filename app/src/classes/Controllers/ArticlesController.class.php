@@ -331,6 +331,7 @@ class ArticlesController extends ProjectAuthMappedController
                 ->setTitle($this->getForm()->get('title')->getValue())
                 ->setAnons($this->getForm()->get('anons')->getValue())
                 ->setText($this->getForm()->get('text')->getValue())
+                ->setProjectId($this->getProject()->getId())
         );
 
         $this->getModule()->init(ArticleOperationEnum::search());
