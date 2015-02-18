@@ -1,6 +1,168 @@
 <?php $partViewer->view('layouts/header'); ?>
 <?php $partViewer->view('menu/up_menu'); ?>
     <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Управление рубриками</h1>
+            </div>
+        </div>
+        <div class="row">
+            <form id="rubric">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-sitemap fa-fw"></i>
+                        Рубрика
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Название</label>
+                            <input type="text" class="form-control" id="short_name"
+                                   placeholder="Название рубрики. Пример `Экономический кризис`" name="short_name"
+                                   required>
+                            <input id="rubric_id" hidden="" type="text" name="rubric_id">
+                        </div>
+                        <div id="short_name_warning" data-id="error">
+                        </div>
 
+                        <div class="form-group">
+                            <label class="form-group">Описание</label>
+                            <textarea
+                                id="description"
+                                class="form-control" rows="3"
+                                placeholder=
+                                "Описание. Пример `Экономический кризис характеризуется падениемпроизводства, происходящим в значительных масштабах.`"
+                                name="description" required></textarea>
+                        </div>
+                        <div id="description_warning" data-id="error">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-group">Ключевая фраза</label>
+                            <textarea id="meta_description" class="form-control" rows="3"
+                                      placeholder
+                                      ="Ключевая фраза. Пример `Кризис в рыночной экономике происходит в результате конъюнктуры на денежном рынке, создаваемой центральными банками и системой не со 100 % нормой резервирования, что приводит к заниженным процентным ставкам, росту денежной массы`"
+                                      name="meta_description" required></textarea>
+                        </div>
+                        <div id="meta_description_warning" data-id="error">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-group">Ключевые слова</label>
+                            <textarea id="meta_keywords" class="form-control" rows="3" name="meta_keywords"
+                                      placeholder="Ключевые слова. Пример `Кризис, Экномический кризис ...`" required
+                                ></textarea>
+                        </div>
+                        <div id="meta_keywords_warning" data-id="error">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Родительская рубрика</label>
+                            <select multiple id="parent" class="form-control" name="parent">
+                            </select>
+                        </div>
+                        <div id="parent_warning" data-id="error">
+                        </div>
+                        <div id="error" data-id="error">
+                        </div>
+
+
+                    </div>
+                    <div class="panel-footer">
+                        <button id="clearForm" class="btn btn-default">Очистить</button>
+                        <button id="addRubric" type="button" class="btn btn-default">
+                            <i class="fa fa-save fa-fw"></i>
+                            Сохранить
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <i class="fa fa-bars fa-fw"></i>
+                    Рубрики
+                </div>
+
+                <div class="panel-body">
+
+                    <table id="rubrics" class="table table-striped" width="100%">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Название</th>
+                            <th>Родитель</th>
+                            <th>Описание</th>
+                            <th>Дата Создания</th>
+                            <th>Дата Редактирования</th>
+                        </tr>
+                        </thead>
+
+                        <tfoot>
+                        <tr>
+                            <th>id</th>
+                            <th>Название</th>
+                            <th>Родитель</th>
+                            <th>Описание</th>
+                            <th>Дата Создания</th>
+                            <th>Дата Редактирования</th>
+                        </tr>
+                        </tfoot>
+
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <button id="getRubric" type="button" class="btn btn-default">
+                        <i class="fa fa-arrow-up fa-fw"></i>
+                        Выбрать
+                    </button>
+                </div>
+
+            </div>
+        </div>
     </div>
+
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Сообщение</h4>
+                </div>
+                <div id="message" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="messageDialogModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Сообщение</h4>
+                </div>
+                <div id="messageDialog" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="saveRubric" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-save fa-fw"></i>
+                        Сохранить
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id=loading tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <img id="gif_loader" src="<?php echo(Project::getBaseUrl()); ?>images/loading.gif" alt="Loading"/>
+    </div>
+
 <?php $partViewer->view('layouts/footer'); ?>

@@ -219,12 +219,51 @@ RouterRewrite::me()
             )
     )
     ->addRoute(
-        'get json rubrics',
-        RouterTransparentRule::create('/rubrics/get')
+        'add rubrics',
+        RouterTransparentRule::create('/rubrics/add/:responseType')
             ->setDefaults(
                 [
                     'area' => 'Rubrics',
-                    'action' => 'getJsonRubric'
+                    'action' => 'add',
+                    'responseType' => null
+                ]
+            )
+    )
+    ->addRoute(
+        'get json rubrics',
+        RouterTransparentRule::create('/rubrics/get/')
+            ->setDefaults(
+                [
+                    'area' => 'Rubrics',
+                    'action' => 'getRubrics',
+                    'responseType' => 'json'
+                ]
+            )
+    )
+    ->addRoute(
+        'get rubrics list json of tree',
+            RouterTransparentRule::create('/rubrics/getlist')
+                ->setDefaults(
+                    [
+                        'area' => 'Rubrics',
+                        'action' => 'getRubricsList',
+                        'responseType' => 'json'
+                    ]
+                )
+    )
+    ->addRoute(
+        'get rubric by id',
+        RouterTransparentRule::create('/rubrics/get/:id')
+            ->setRequirements(
+                [
+                    'id' => '\d+'
+                ]
+            )
+            ->setDefaults(
+                [
+                    'area' => 'Rubrics',
+                    'action' => 'getById',
+                    'responseType' => 'json'
                 ]
             )
     )

@@ -1,3 +1,9 @@
 .logo-media {
     color: #ea0a11;
 }
+
+#gif_loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+}
