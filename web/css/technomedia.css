@@ -7,3 +7,12 @@
     top: 50%;
     left: 50%;
 }
+
+#edit{
+    margin-top: -3px;
+    margin-right: 3px;
+}
+
+#add{
+    margin-top: -3px;
+}

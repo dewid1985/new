@@ -214,82 +214,7 @@ var reloadNewsDataAjax = function () {
 /**********************************************************************************************************************/
 
 var Rubric = {
-    add: function () {
-        $("div[data-id='error']").empty()
-        $.ajax({
-            type: "POST",
-            url: 'add/json',
-            data: $('#rubric').serialize(),
-            error: function () {
-                Rubric.setMessageTpl($().technomedia.totalRubricError)
-            },
-            beforeSend: function () {
-                $('#loading').modal('show');
-            },
-            complete: function () {
-                Rubric.rubricListData.api().ajax.reload();
-                Rubric.setRubric();
-                Rubric.resetFormRubric();
-                $('#loading').modal('hide');
-            },
-            success: function (data) {
-                try {
-                    data = $.parseJSON(data);
-                    if (false === data.success) {
-                        Rubric.setWarningTpl(data.errors);
-                    } else {
-                        Rubric.setMessageTpl($().technomedia.saveRubricOk)
-                    }
-                } catch (e) {
-                    Rubric.setMessageTpl($().technomedia.totalRubricError)
-                }
-            }
-        });
-
-    },
-    setWarningTpl: function (error) {
-        $.each(error, function (k, v) {
-            $('#' + k + '_warning').append(
-                "<div class='alert alert-warning alert-dismissible fade in' role='alert'>" +
-                "<button class='close' type='button' data-dismiss='alert' aria-label='Close'>" +
-                "<span aria-hidden='true'>×</span>" +
-                "</button>" +
-                "<strong>" + $().technomedia.totalRubricError + "</strong> " + v +
-                "</div>"
-            );
-        })
-    },
-    setMessageTpl: function (message) {
-        $('#message').empty();
-        $('#message').html(message);
-        $('#messageModal').modal('show');
-    },
-    setRubric: function () {
-
-        $.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
-            $('option', $("#parent")).remove();
-            $.each(json.data, function (id, name) {
-                $('#parent').append('<option data-id="' + id + '">' + name + '</option>');
-            })
-        })
-    },
-    resetFormRubric: function () {
-        $('#rubric')[0].reset();
-        $('#parent option:selected').each(function () {
-            this.selected = false;
-        });
-
-    },
-    addRubricsClick: $('#addRubric').click(function () {
-        if ($('#rubric_id').val() == "") {
-            $('#messageDialog').html($().technomedia.saveRubricDialogMessage);
-            $('#messageDialogModal').modal("show");
-        } else {
-            $('#messageDialog').html($().technomedia.updateRubricDialogMessage);
-            $('#messageDialogModal').modal("show");
-        }
-    }),
-    rubricListData: $('#rubrics').dataTable(
+    table: $('#rubrics').dataTable(
         {
             "language": {
                 "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"
@@ -315,42 +240,177 @@ var Rubric = {
             ]
         }
     ),
-    selectedRubric: $('#rubrics tbody').on('click', 'tr', function () {
-        if ($(this).hasClass('selected')) {
-            $(this).removeClass('selected');
-        }
-        else {
-            Rubric.rubricListData.$('tr.selected').removeClass('selected');
-            $(this).addClass('selected');
-        }
-    }),
-    getRubric: $('#getRubric').click(function () {
-        if (!Rubric.rubricListData.api().row('.selected').length)
-            return Rubric.setMessageTpl($().technomedia.selectedRubric);
-        RubricId = Rubric.rubricListData.api().row('.selected').data().id;
-        Rubric.resetFormRubric();
-        $.getJSON(getBaseUrl() + 'rubrics/get/' + RubricId, function (json) {
-            if (json.success == false)
-                return Rubric.setMessageTpl($().technomedia.totalRubricError);
+    init: function () {
+        $("#rubric-row").hide();
 
-            $.each(json.data, function (field, value) {
-                if (field === 'parent') {
-                    $("#parent [data-id='" + value + "']").attr('selected', true);
-                } else {
-                    $('#' + field).val(value);
-                }
-            });
+        $('#addRubric').click(function () {
+            if ($('#rubric_id').val().length == 0) {
+                Rubric.setMessageSave($().technomedia.saveRubricDialogMessage);
+
+            } else {
+                Rubric.setMessageSave($().technomedia.updateRubricDialogMessage);
+            }
         });
-        $('body,html').animate({scrollTop: 0}, 500);
-    }),
-    saveRubric: $('#saveRubric').click(function () {
-        Rubric.add();
-    }),
-    clearForm: $('#clearForm').click(function () {
-        Rubric.resetFormRubric();
-    })
 
+        $('#edit').click(function () {
+            if (!Rubric.table.api().row('.selected').length)
+                return Rubric.setMessageTpl($().technomedia.selectedRubric);
+            RubricId = Rubric.table.api().row('.selected').data().id;
+            Rubric.clear();
+            $.getJSON(getBaseUrl() + 'rubrics/get/' + RubricId, function (json) {
+                if (json.success == false)
+                    return Rubric.setMessageTpl($().technomedia.totalRubricError);
+                $.each(json.data, function (field, value) {
+                    if (field === 'parent') {
+                        $("#parent [data-id='" + value + "']").attr('selected', true);
+                    } else {
+                        $('#' + field).val(value);
+                    }
+                });
+            });
+            $('#rubric-row').animate({height: 'show'}, 500);
+            $('body,html').animate({scrollTop: 0}, 500);
+        });
+
+        $('#saveRubric').click(function () {
+            Rubric.add();
+        });
+
+        $('#clearForm').click(function () {
+            $.noty.closeAll();
+            Rubric.clear();
+        });
+
+        if ($('#parent').exists()) Rubric.setRubric();
+
+        $('#rubrics tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                Rubric.table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#add').click(function(){
+            $('#rubric-row').animate({height: 'show'}, 500);
+        });
+
+        $('#closeAddRubric').click(function(){
+            $('#rubric-row').animate({height: 'hide'}, 500);
+        });
+    },
+    add: function () {
+        $("div[data-id='error']").empty()
+        $.ajax({
+            type: "POST",
+            url: 'add/json',
+            data: $('#rubric').serialize(),
+            error: function () {
+                Rubric.setMessageTpl($().technomedia.totalRubricError)
+            },
+            beforeSend: function () {
+                $('#loading').modal('show');
+            },
+            complete: function () {
+                Rubric.table.api().ajax.reload();
+                Rubric.setRubric();
+                $('#loading').modal('hide');
+            },
+            success: function (data) {
+                try {
+                    data = $.parseJSON(data);
+                    if (false === data.success) {
+                        Rubric.setErrorForm(data.errors);
+                    } else {
+                        Rubric.setMessageTpl($().technomedia.saveRubricOk);
+                        Rubric.clear();
+                    }
+                } catch (e) {
+                    Rubric.setMessageTpl($().technomedia.totalRubricError);
+                    Rubric.clear();
+                }
+                $('body,html').animate({scrollTop: 0}, 500);
+            }
+        });
+    },
+    clear: function () {
+        $('#rubric')[0].reset();
+        $('#parent option:selected').each(function () {
+            this.selected = false;
+        });
+    },
+    setErrorForm: function (error) {
+        $.each(error, function (k, v) {
+
+            if (k === 'failureSave')
+                Rubric.setMessageTpl(v);
+
+            $('#' + k + '_warning').noty({
+                text: v,
+                type: 'information',
+                dismissQueue: true,
+                layout: 'topCenter',
+                theme: 'defaultTheme',
+                maxVisible: 30
+            });
+
+        })
+    },
+    setMessageTpl: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnClose,
+                    onClick: function ($noty) {
+                        $noty.close();
+                    }
+                }
+            ]
+        });
+    },
+    setMessageSave: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-primary',
+                    text: $().technomedia.btnSaveOk,
+                    onClick: function ($noty) {
+                        $noty.close();
+                        Rubric.add();
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnSaveCancel,
+                    onClick: function ($noty) {
+                        $noty.close();
+                    }
+                }
+            ]
+        });
+    },
+    setRubric: function () {
+        $.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
+            $('option', $("#parent")).remove();
+            $.each(json.data, function (id, name) {
+                $('#parent').append('<option data-id="' + id + '">' + name + '</option>');
+            })
+        })
+    }
 };
 
-if ($('#parent').exists()) Rubric.setRubric();
+Rubric.init();
 

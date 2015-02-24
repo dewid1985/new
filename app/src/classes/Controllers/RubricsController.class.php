@@ -16,6 +16,24 @@ class RubricsController extends ProjectAuthMappedController
     /** @var  Form */
     protected $form;
 
+    /** @var array */
+    protected $rubrics = array();
+
+    /**
+     * @return array
+     */
+    public function getRubrics()
+    {
+        return $this->rubrics;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setRubrics($value)
+    {
+        $this->rubrics[] = $value;
+    }
 
     /**
      * @return Form
@@ -61,12 +79,23 @@ class RubricsController extends ProjectAuthMappedController
     {
         /** @var  ProjectResponseView $responseView */
         $responseView = ProjectResponseView::create();
+
+        if (!empty($request->getPostVar('rubric_id')))
+            return $this->saveRubricAction($request);
+
         $this->setForm(
             $this->getFormAddValidation()->import($request->getPost())
         );
 
         if ($this->getForm()->getError('short_name'))
             $responseView->setError('short_name', $this->getForm()->getTextualErrorFor('short_name'));
+
+        if (!PlatformCommonRubric::checkRubricByName(
+            $this->transliterate(
+                $this->getForm()->get('short_name')->getValue()
+            )
+        )
+        ) $responseView->setError('short_name', PlatformRubricErrorEnum::thereIsRubric()->getName());
 
         if ($this->getForm()->getError('description'))
             $responseView->setError('description', $this->getForm()->getTextualErrorFor('description'));
@@ -79,9 +108,6 @@ class RubricsController extends ProjectAuthMappedController
 
         if (!empty($responseView->getError()))
             return $this->getModelAndView($responseView->setSuccess(false));
-
-        if (!empty($request->getPostVar('rubric_id')))
-            return $this->saveRubricAction($request);
 
         $requestModule = ModuleRubricsAddOperationRequest::create();
 
@@ -112,6 +138,26 @@ class RubricsController extends ProjectAuthMappedController
     public function saveRubricAction(HttpRequest $request)
     {
         $responseView = ProjectResponseView::create();
+
+        $this->setForm(
+            $this->getFormAddValidation()->import($request->getPost())
+        );
+
+        if ($this->getForm()->getError('short_name'))
+            $responseView->setError('short_name', $this->getForm()->getTextualErrorFor('short_name'));
+
+        if ($this->getForm()->getError('description'))
+            $responseView->setError('description', $this->getForm()->getTextualErrorFor('description'));
+
+        if ($this->getForm()->getError('meta_description'))
+            $responseView->setError('meta_description', $this->getForm()->getTextualErrorFor('meta_description'));
+
+        if ($this->getForm()->getError('meta_keywords'))
+            $responseView->setError('meta_keywords', $this->getForm()->getTextualErrorFor('meta_keywords'));
+
+        if (!empty($responseView->getError()))
+            return $this->getModelAndView($responseView->setSuccess(false));
+
         $requestModule = ModuleRubricsSaveOperationRequest::create();
 
         if (array_key_exists('parent', $request->getPost()))
@@ -136,7 +182,16 @@ class RubricsController extends ProjectAuthMappedController
                 ->setDescription($this->getForm()->get('description')->getValue())
         );
 
-        $this->getModule()->init(RubricsOperationEnum::save());
+        try {
+            $this->getModule()->init(RubricsOperationEnum::save());
+        }catch (OperationSaveRubricException $e)
+        {
+            return $this->getModelAndView(
+                $responseView
+                    ->setSuccess(false)
+                    ->setError('failureSave',PlatformRubricErrorEnum::failure()->getName())
+            );
+        }
         return $this->getModelAndView($responseView->setSuccess(true));
     }
 
@@ -277,6 +332,21 @@ class RubricsController extends ProjectAuthMappedController
     protected function replacedBySpace($path)
     {
         return implode('', array_pad(array(), count(explode('.', $path)), '&nbsp&nbsp'));
+//
+//        $str = null;
+//        $this->setRubrics($path);
+//
+//        if (count($this->getRubrics()) == 1) {
+//            return '|--';
+//        }
+//
+//        for ($i = 1; $i <= count(explode(".", $path)); $i++)
+//            if ($i > count(explode(".", $path)) - 1)
+//                $str .= "---";
+//            else
+//                $str .= "|&nbsp&nbsp";
+//
+//        return $str;
     }
 
 

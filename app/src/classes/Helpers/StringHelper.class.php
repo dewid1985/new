@@ -26,7 +26,6 @@ trait StringHelper
 
     function transliterate($str)
     {
-
         return strtr(str_replace(" ", "", $str), $this->translit);
     }
 }

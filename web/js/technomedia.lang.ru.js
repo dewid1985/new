@@ -6,6 +6,10 @@ $.fn.technomedia = {
     saveRubricOk: ['Рубрика успешно сохраннена'],
     errorRubricTitle: ['Ошибка'],
     selectedRubric: ['Выберите рубрику'],
-    saveRubricDialogMessage: ['Вы действительно хотите сохранить новую рубрику?'],
-    updateRubricDialogMessage: ['Переименновывая рубрику, она так же перееименуется у потомков. Вы действительно хотите сохранить?']
+    saveRubricDialogMessage: ['Cохранить новую рубрику?'],
+    updateRubricDialogMessage: ['Будут переименованны подрубрики. Сохранить рубрику'],
+    insertDataForm:['Пожалуйста заполните поле `Название`'],
+    btnSaveOk:['<i class="fa fa-save fa-fw"></i>Сохранить'],
+    btnSaveCancel:['Отмена'],
+    btnClose:['Закрыть']
 };
