@@ -1,155 +1,112 @@
 <?php $partViewer->view('layouts/header'); ?>
 <?php $partViewer->view('menu/up_menu'); ?>
-<?php UiBootstrapArticlesHelper::me()->setAction($operation) ?>
-<!-- Рабочая область -->
-<div id="page-wrapper">
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header"><?php UiBootstrapArticlesHelper::me()->getTitle($data); ?></h1>
-        </div>
-    </div>
-    <!-- /.row -->
-    <div class="row">
-        <div class="panel panel-default">
-
-            <div class="panel-heading">
-                <i class="fa fa-bars fa-fw"></i>
-                Статья
+    <!-- Рабочая область -->
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Статья</h1>
             </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-bars fa-fw"></i>
+                    Статья
+                </div>
+                <form id="article" method="post">
+                    <div class="panel-body">
+                        <input hidden="" name="articleId" id="articleId">
 
-            <div class="panel-body">
-                <form method="post" action="<?php UiBootstrapArticlesHelper::me()->getUrl() ?>">
-                    <?php if (array_key_exists('articleId', $data)): ?>
-                        <input hidden=""
-                               value="<?php UiBootstrapArticlesHelper::me()->insertText($data['articleId']) ?>"
-                               name="articleId">
-                    <?php endif; ?>
-                    <div class="form-group">
-                        <label for="" data-toggle="tooltip" data-placement="top"
-                               title="Загловок статьи. Поле обязательно для сохранения!"> Заголовок
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Загловок статьи. Поле обязательно для сохранения!"> Заголовок
                             </label>
-                        <input type="text" name="title" class="form-control"
-                               <?php
-                               if (array_key_exists('title', $data))
-                                   UiBootstrapArticlesHelper::me()->value($data['title']);
-                               ?>placeholder="Заголовок" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="" data-toggle="tooltip" data-placement="top"
-                               title="Анонс. Поле обязательно для сохранения!"> Анонс</label>
-                    <textarea rows="3" name="anons" class="form-control" placeholder="Анонс" required><?php
-                        if (array_key_exists('anons', $data))
-                            UiBootstrapArticlesHelper::me()->insertText($data['anons']);
-                        ?></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="" data-toggle="tooltip" data-placement="top"
-                               title="description">Ключевая фраза</label>
-                    <textarea rows="3" name="meta_description" class="form-control" placeholder="Ключевая фраза"
-                              required><?php
-                        if (array_key_exists('meta_description', $data))
-                            UiBootstrapArticlesHelper::me()->insertText($data['meta_description']);
-                        ?></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="" data-toggle="tooltip" data-placement="top"
-                               title="Keywords"> Ключевые слова </label>
-                    <textarea rows="3" name="meta_keywords" class="form-control"
-                              placeholder="Ключевые слова через запятую" required><?php
-                        if (array_key_exists('meta_keywords', $data))
-                            UiBootstrapArticlesHelper::me()->insertText($data['meta_keywords']);
-                        ?></textarea>
-                    </div>
-                    <div class="form-group" id="rubric">
-                        <label for="" data-toggle="tooltip" data-placement="top"
-                               title="Выбор рубрики для статьи. Статья принадлежит как минимум 1-ой рубрики максимум к 3">
-                            Рубрики
-                        </label>
-                        <button type="button" class="btn" data-toggle="modal" data-target="#myModal"
-                                onclick="getRubrics()">
-                            Привязать к рубрике
-                        </button>
-                        <?php
-                        UiBootstrapArticlesHelper::me()->rubrics($data);
-                        ?>
-                    </div>
-                    <?php
-                    if (array_key_exists('rubrics', $errors))
-                        UiBootstrapArticlesHelper::me()->alertWarning($errors['rubrics']);
-                    ?>
-                    <div class="form-group">
-                        <label for="" data-toggle="tooltip" data-placement="top"
-                               title="Содержимое статьи: текст, изображение. Поле обязательно для сохранения!">
-                            Содержимое статьи
-                        </label>
-                    <textarea rows="20" class="Editor" name="text"><?php
-                        if (array_key_exists('text', $data))
-                            UiBootstrapArticlesHelper::me()->insertText($data['text']);
-                        ?></textarea>
-                    </div>
-                    <?php
-                    if (array_key_exists('text', $errors))
-                        UiBootstrapArticlesHelper::me()->alertWarning($errors['text']);
-                    ?>
-                    <div class="form-group">
-                        <label for="" data-toggle="tooltip" data-placement="top"
-                               title="Автор статьи"> Автор статьи</label>
-                        <input type="text" name="author" class="form-control"
-                               <?php
-                               if (array_key_exists('author', $data))
-                                   UiBootstrapArticlesHelper::me()->value($data['author']);
-                               ?>placeholder="Автор статьи" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="openDate" data-toggle="tooltip" data-placement="top"
-                               title="Поле обязательно для сохранения!">
-                            Время публикации статьи</label>
-
-                        <div class="input-group date form_datetime col-md-5" data-date=""
-                             data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
-                            <input class="form-control" size="16" name="published_at" type="text"
-                                <?php if (array_key_exists('published_at', $data))
-                                    UiBootstrapArticlesHelper::me()->value($data['published_at']);
-                                ?>
-                                   readonly>
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            <input id="title" anons="title" type="text" name="title" class="form-control"
+                                   placeholder="Заголовок" required>
                         </div>
-                        <input type="hidden" id="timeOfPublication" value=""/>
+                        <div id="title_warning" data-id="error">
+                        </div>
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Анонс. Поле обязательно для сохранения!"> Анонс</label>
+                            <textarea id="anons" rows="3" name="anons" class="form-control" placeholder="Анонс"
+                                      required></textarea>
+                        </div>
+                        <div id="anons_warning" data-id="error">
+                        </div>
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="description">Ключевая фраза</label>
+                    <textarea id="meta_description" rows="3" name="meta_description" class="form-control"
+                              placeholder="Ключевая фраза"
+                              required></textarea>
+                        </div>
+                        <div id="meta_description_warning" data-id="error">
+                        </div>
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Keywords"> Ключевые слова </label>
+                    <textarea id="meta_keywords" rows="3" name="meta_keywords" class="form-control"
+                              placeholder="Ключевые слова через запятую" required></textarea>
+                        </div>
+                        <div id="meta_keywords_warning" data-id="error" style="margin-bottom: 10px">
+                        </div>
+                        <div class="form-group" id="rubric">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Статья принадлежит как минимум 1-ой рубрики максимум к 3-м">
+                                Рубрики
+                            </label>
+                            <button type="button" class="btn" data-toggle="modal" data-target="#myModal"
+                                    onclick="getRubrics()">
+                                Привязать к рубрике
+                            </button>
+                        </div>
+                        <div id="rubrics_warning" data-id="error">
+                        </div>
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Содержимое статьи: текст, изображение. Поле обязательно для сохранения!">
+                                Содержимое статьи
+                            </label>
+                            <textarea id="text" rows="20" class="Editor" name="text"></textarea>
+                        </div>
+                        <div id="text_warning" data-id="error">
+                        </div>
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Автор статьи"> Автор статьи</label>
+                            <input type="text" name="author" id="author" class="form-control" placeholder="Автор статьи"
+                                   required>
+                        </div>
+                        <div id="author_warning" data-id="author_warning">
+                        </div>
+                        <div class="form-group">
+                            <label for="openDate" data-toggle="tooltip" data-placement="top"
+                                   title="Поле обязательно для сохранения!">
+                                Время публикации статьи</label>
+
+                            <div class="input-group date form_datetime col-md-5" data-date=""
+                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
+                                <input class="form-control" size="16" name="published_at" id="published_at" type="text"
+                                       readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                            <input type="hidden" id="timeOfPublication" value=""/>
+                        </div>
+                        <div id="published_at_warning" data-id="error">
+                        </div>
                     </div>
-                    <?php
-                    if (array_key_exists('published_at', $errors))
-                        UiBootstrapArticlesHelper::me()->alertWarning($errors['published_at']);
-                    ?>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-default" data-toggle="tooltip" data-placement="top">
-                            <?php UiBootstrapArticlesHelper::me()->getNameButton($operation) ?>
-                        </button>
+                    <div class="panel-footer">
+                        <div id="article_save" type="submit" class="btn btn-primary" type="button">
+                            <i class="fa fa-save fa-fw"></i>
+                            Сохранить
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <!-- Рубрики -->
-    <div class="modal fade bs-example-modal-sm"
-         id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content modal-sm">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Выбор рубрики</h4>
-                </div>
-                <div class="modal-body">
-                    <select multiple class="form-control" id="rubricName">
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Завершить</button>
-                    <button type="button" class="btn btn-primary" id="relatedToArticle">Привязать</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<?php $partViewer->view('html-helper/select-rubric'); ?>
+<?php $partViewer->view('html-helper/loader'); ?>
 <?php $partViewer->view('layouts/footer'); ?>

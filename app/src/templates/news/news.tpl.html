@@ -6,17 +6,14 @@
             <h1 class="page-header">Список новостей</h1>
         </div>
     </div>
-
     <div class="row">
         <form id="search">
             <div class="panel panel-default">
-
                 <div class="panel-heading">
                     <i class="fa fa-search fa-fw"></i>
                     Поиск по :
                 </div>
                 <div class="panel-body">
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="exampleInputName2">Заголовку</label>
@@ -24,21 +21,17 @@
                                    placeholder="Часть заголовка или слова через запятую">
                         </div>
                         <p></p>
-
                         <div class="form-group">
                             <label for="exampleInputName2">Аннонсу</label>
                             <input type="text" class="form-control" id="anons"
                                    placeholder="Часть аннонса или слова через запятую">
                         </div>
-
                         <div class="form-group">
                             <label for="exampleInputName2">Содержимому</label>
                             <input type="text" class="form-control" id="text"
                                    placeholder="Часть содержимого или слова через запятую">
                         </div>
                     </div>
-
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="exampleInputName2">По дате создания</label>
@@ -137,11 +130,10 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="panel-footer">
-                    <div class="btn btn-default" type="submit" onclick="reloadNewsDataAjax()"><i
-                            class="fa fa-search fa-fw"></i>Поиск
+                    <div id="search_news" class="btn btn-primary" type="submit">
+                        <i class="fa fa-search fa-fw"></i>Поиск
                     </div>
                     <button class="btn btn-default" type="reset" style="margin-right: 5px;">Очистить все
                         поля
@@ -151,7 +143,6 @@
             </div>
         </form>
     </div
-
         <!-- /.row -->
     <div class="row">
         <div class="panel panel-default">
@@ -159,9 +150,7 @@
                 <i class="glyphicon glyphicon-globe"></i>
                 Новости
             </div>
-
             <div class="panel-body">
-
                 <table id="news" class="table table-striped" width="100%">
                     <thead>
                     <tr>
@@ -171,10 +160,8 @@
                         <th>Дата Редактирования</th>
                         <th>Дата Публикации</th>
                         <th></th>
-
                     </tr>
                     </thead>
-
                     <tfoot>
                     <tr>
                         <th>id</th>

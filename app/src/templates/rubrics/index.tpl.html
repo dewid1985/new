@@ -12,7 +12,7 @@
                     <div class="panel-heading">
                         <i class="fa fa-sitemap fa-fw"></i>
                         Рубрика
-                        <button  id="closeAddRubric" class="close"  type="button">×</button>
+                        <button id="closeAddRubric" class="close" type="button">×</button>
                     </div>
 
                     <div class="panel-body">
@@ -25,7 +25,6 @@
                         </div>
                         <div id="short_name_warning" data-id="error">
                         </div>
-
                         <div class="form-group">
                             <label class="form-group">Описание</label>
                             <textarea
@@ -37,7 +36,6 @@
                         </div>
                         <div id="description_warning" data-id="error">
                         </div>
-
                         <div class="form-group">
                             <label class="form-group">Ключевая фраза</label>
                             <textarea id="meta_description" class="form-control" rows="3"
@@ -55,7 +53,6 @@
                         </div>
                         <div id="meta_keywords_warning" data-id="error">
                         </div>
-
                         <div class="form-group">
                             <label for="exampleInputEmail1">Родительская рубрика</label>
                             <select multiple id="parent" class="form-control" name="parent">
@@ -65,7 +62,6 @@
                         </div>
                         <div id="error" data-id="error">
                         </div>
-
                     </div>
                     <div class="panel-footer">
                         <div id="clearForm" class="btn btn-default">Очистить</div>
@@ -79,24 +75,13 @@
         </div>
         <div class="row">
             <div class="panel panel-default">
-
                 <div class="panel-heading">
-                    <i class="fa fa-bars fa-fw"></i>
-                    Рубрики
-
-                    <div id="add" type="button" class="pull-right btn btn-default btn-sm">
-                        <i class="glyphicon glyphicon-plus"></i>
+                    <div id="add" type="button" class="btn btn-primary">
+                        <i class="fa fa-share"></i>
                         Создать
                     </div>
-                    <div id="edit" type="button" class="pull-right btn btn-default btn-sm">
-                        <i class="glyphicon glyphicon-pencil"></i>
-                        Редактировать
-                    </div>
-
                 </div>
-
                 <div class="panel-body">
-
                     <table id="rubrics" class="table table-striped" width="100%">
                         <thead>
                         <tr>
@@ -106,9 +91,9 @@
                             <th>Описание</th>
                             <th>Дата Создания</th>
                             <th>Дата Редактирования</th>
+                            <th></th>
                         </tr>
                         </thead>
-
                         <tfoot>
                         <tr>
                             <th>id</th>
@@ -117,19 +102,15 @@
                             <th>Описание</th>
                             <th>Дата Создания</th>
                             <th>Дата Редактирования</th>
+                            <th></th>
                         </tr>
                         </tfoot>
-
                     </table>
                 </div>
                 <div class="panel-footer">
                 </div>
-
             </div>
         </div>
     </div>
-    <div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <img id="gif_loader" src="<?php echo(Project::getBaseUrl()); ?>images/loading.gif" alt="Loading"/>
-    </div>
-
+<?php $partViewer->view('html-helper/loader'); ?>
 <?php $partViewer->view('layouts/footer'); ?>

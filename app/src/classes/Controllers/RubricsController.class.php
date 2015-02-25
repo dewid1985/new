@@ -11,7 +11,7 @@ class RubricsController extends ProjectAuthMappedController
     use StringHelper;
 
     /** @var Module */
-    protected $module = null;
+    protected $module = NULL;
 
     /** @var  Form */
     protected $form;
@@ -107,7 +107,7 @@ class RubricsController extends ProjectAuthMappedController
             $responseView->setError('meta_keywords', $this->getForm()->getTextualErrorFor('meta_keywords'));
 
         if (!empty($responseView->getError()))
-            return $this->getModelAndView($responseView->setSuccess(false));
+            return $this->getModelAndView($responseView->setSuccess(FALSE));
 
         $requestModule = ModuleRubricsAddOperationRequest::create();
 
@@ -125,14 +125,14 @@ class RubricsController extends ProjectAuthMappedController
                 )
                 ->setShortName($this->getForm()->get('short_name')->getValue())
                 ->setCreatedAt(TimestampTZ::makeNow())
-                ->setEnabled(true)
+                ->setEnabled(TRUE)
                 ->setMetaKeywords($this->getForm()->get('meta_keywords')->getValue())
                 ->setMetaDescription($this->getForm()->get('meta_description')->getValue())
                 ->setDescription($this->getForm()->get('description')->getValue())
         );
 
         $this->getModule()->init(RubricsOperationEnum::add());
-        return $this->getModelAndView($responseView->setSuccess(true));
+        return $this->getModelAndView($responseView->setSuccess(TRUE));
     }
 
     public function saveRubricAction(HttpRequest $request)
@@ -156,7 +156,7 @@ class RubricsController extends ProjectAuthMappedController
             $responseView->setError('meta_keywords', $this->getForm()->getTextualErrorFor('meta_keywords'));
 
         if (!empty($responseView->getError()))
-            return $this->getModelAndView($responseView->setSuccess(false));
+            return $this->getModelAndView($responseView->setSuccess(FALSE));
 
         $requestModule = ModuleRubricsSaveOperationRequest::create();
 
@@ -176,7 +176,7 @@ class RubricsController extends ProjectAuthMappedController
                 )
                 ->setShortName($this->getForm()->get('short_name')->getValue())
                 ->setModifiedAt(TimestampTZ::makeNow())
-                ->setEnabled(true)
+                ->setEnabled(TRUE)
                 ->setMetaKeywords($this->getForm()->get('meta_keywords')->getValue())
                 ->setMetaDescription($this->getForm()->get('meta_description')->getValue())
                 ->setDescription($this->getForm()->get('description')->getValue())
@@ -188,11 +188,11 @@ class RubricsController extends ProjectAuthMappedController
         {
             return $this->getModelAndView(
                 $responseView
-                    ->setSuccess(false)
+                    ->setSuccess(FALSE)
                     ->setError('failureSave',PlatformRubricErrorEnum::failure()->getName())
             );
         }
-        return $this->getModelAndView($responseView->setSuccess(true));
+        return $this->getModelAndView($responseView->setSuccess(TRUE));
     }
 
     /**
@@ -281,7 +281,7 @@ class RubricsController extends ProjectAuthMappedController
             $responseModule = $this->getModule()->getModuleObject()->getResponse();
 
             $responseView
-                ->setSuccess(true)
+                ->setSuccess(TRUE)
                 ->setData('rubric_id', $responseModule->getRubricId())
                 ->setData('short_name', $responseModule->getShortName())
                 ->setData('description', $responseModule->getDescription())
@@ -292,7 +292,7 @@ class RubricsController extends ProjectAuthMappedController
             return $this->getModelAndView($responseView);
         } catch (ObjectNotFoundException $e) {
             return $this->getModelAndView(
-                ProjectResponseView::create()->setSuccess(false)
+                ProjectResponseView::create()->setSuccess(FALSE)
             );
         }
     }

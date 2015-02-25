@@ -6,7 +6,6 @@
             <h1 class="page-header">Список статей</h1>
         </div>
     </div>
-
     <div class="row">
         <form id="search">
             <div class="panel panel-default">
@@ -15,9 +14,7 @@
                     <i class="fa fa-search fa-fw"></i>
                     Поиск по :
                 </div>
-
                 <div class="panel-body">
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="exampleInputName2">Заголовку</label>
@@ -31,16 +28,12 @@
                             <input type="text" class="form-control" id="anons"
                                    placeholder="Часть аннонса или слова через запятую">
                         </div>
-
                         <div class="form-group">
                             <label for="exampleInputName2">Содержимому</label>
                             <input type="text" class="form-control" id="text"
                                    placeholder="Часть содержимого или слова через запятую">
                         </div>
-
                     </div>
-
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="exampleInputName2">По дате создания</label>
@@ -77,7 +70,6 @@
 
                             <div class="row">
                                 <div class="col-sm-12">
-
                                     <div class="row">
                                         <div class="col-xs-6 col-sm-6">
                                             <div class="input-group date form_datetime" data-date=""
@@ -110,7 +102,6 @@
 
                             <div class="row">
                                 <div class="col-sm-12">
-
                                     <div class="row">
                                         <div class="col-xs-6 col-sm-6">
                                             <div class="input-group date form_datetime" data-date=""
@@ -141,29 +132,24 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                    <div class="btn btn-default" type="submit" onclick="reloadArticlesDataAjax()"><i
-                            class="fa fa-search fa-fw"></i>Поиск
+                    <div id="search_article" class="btn btn-primary" type="submit">
+                        <i class="fa fa-search fa-fw"></i>Поиск
                     </div>
                     <button class="btn btn-default" type="reset" style="margin-right: 5px;">Очистить все
                         поля
                     </button>
                 </div>
-
             </div>
         </form>
     </div
-
         <!-- /.row -->
     <div class="row">
         <div class="panel panel-default">
-
             <div class="panel-heading">
                 <i class="fa fa-bars fa-fw"></i>
                 Статьи
             </div>
-
             <div class="panel-body">
-
                 <table id="articles" class="table table-striped" width="100%">
                     <thead>
                     <tr>
@@ -174,10 +160,8 @@
                         <th>Дата Редактирования</th>
                         <th>Дата Публикации</th>
                         <th></th>
-
                     </tr>
                     </thead>
-
                     <tfoot>
                     <tr>
                         <th>id</th>
@@ -189,13 +173,10 @@
                         <th></th>
                     </tr>
                     </tfoot>
-
                 </table>
             </div>
         </div>
     </div>
 </div>
 <!-- /.panel-body -->
-
-
 <?php $partViewer->view('layouts/footer'); ?>

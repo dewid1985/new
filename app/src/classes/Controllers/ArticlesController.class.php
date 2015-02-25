@@ -1,9 +1,9 @@
 <?php
+
 /***************************************************************************
  *   Статьи                                                                *
- *   @author Schon Dewid  2015                                             *
+ * @author Schon Dewid  2015                                               *
  ***************************************************************************/
-
 class ArticlesController extends ProjectAuthMappedController
 {
     use ResponseView;
@@ -53,7 +53,7 @@ class ArticlesController extends ProjectAuthMappedController
      * @param ProjectResponseView $responseView
      * @return ModelAndView
      */
-    public function editorAction(HttpRequest $request, ProjectResponseView $responseView = null)
+    public function editorAction(HttpRequest $request, ProjectResponseView $responseView = NULL)
     {
         if (is_null($responseView))
             $responseView =
@@ -75,6 +75,9 @@ class ArticlesController extends ProjectAuthMappedController
      */
     public function addDraftAction(HttpRequest $request)
     {
+        if (!empty($request->getPostVar('articleId')))
+            return $this->saveDraftAction($request);
+
         /** @var  ProjectResponseView $responseView */
         $responseView = ProjectResponseView::create();
         $responseView->setOperation('add');
@@ -85,10 +88,17 @@ class ArticlesController extends ProjectAuthMappedController
                 ->import($request->getPost())
         );
 
+
         $responseView->setDataArray($request->getPost());
 
         if (empty($rubric = $this->getRubricFromRequest($request)))
             $responseView->setError('rubrics', PlatformSaveArticleErrorEnum::getErrorRequiredRubric()->getName());
+
+        if ($this->getForm()->getError('title'))
+            $responseView->setError('title', $this->getForm()->getTextualErrorFor('title'));
+
+        if ($this->getForm()->getError('anons'))
+            $responseView->setError('anons', $this->getForm()->getTextualErrorFor('anons'));
 
         if ($this->getForm()->getError('text'))
             $responseView->setError('text', $this->getForm()->getTextualErrorFor('text'));
@@ -106,7 +116,7 @@ class ArticlesController extends ProjectAuthMappedController
             $responseView->setError('author', $this->getForm()->getTextualErrorFor('author'));
 
         if (!empty($responseView->getError()))
-            return $this->editorAction($request, $responseView->setSuccess(false));
+            return $this->editorAction($request, $responseView->setSuccess(FALSE));
 
         $createdAt = TimestampTZ::makeNow();
 
@@ -182,7 +192,7 @@ class ArticlesController extends ProjectAuthMappedController
             $responseView->setError('author', $this->getForm()->getTextualErrorFor('author'));
 
         if (!empty($responseView->getError()))
-            return $this->editorAction($request, $responseView->setSuccess(false));
+            return $this->editorAction($request, $responseView->setSuccess(FALSE));
 
         $this->getModule()->getModuleObject()->setRequest(
             ModuleArticleAddOperationRequest::create()
@@ -223,6 +233,7 @@ class ArticlesController extends ProjectAuthMappedController
      */
     public function getDraftAction(HttpRequest $request)
     {
+        $rubrics = array();
         $this->getModule()->getModuleObject()->setRequest(
             ModuleArticleGetOperationRequest::create()
                 ->setArticleId($request->getAttachedVar('articleId'))
@@ -246,7 +257,12 @@ class ArticlesController extends ProjectAuthMappedController
             ->setData('meta_keywords', $response->getMetaKeywords());
 
         foreach ($response->getRubrics()->getList() as $k => $v)
-            $responseView->setData($k, PlatformCommonRubric::dao()->getById($v)->getName());
+            $rubrics[$k] = array(
+                'short_name' => PlatformCommonRubric::dao()->getById($v)->getRubricData()->getShortName(),
+                'name' => PlatformCommonRubric::dao()->getById($v)->getName(),
+            );
+
+        $responseView->setData('rubrics', $rubrics);
 
         $responseView->setOperation('save');
         $responseView->setData('titlePage', PlatformArticleTitleEnum::saveAticle()->getName());

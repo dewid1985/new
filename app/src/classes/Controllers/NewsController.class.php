@@ -54,7 +54,7 @@ class NewsController extends ProjectAuthMappedController
      * @param ProjectResponseView $responseView
      * @return ModelAndView
      */
-    public function editorAction(HttpRequest $request, ProjectResponseView $responseView = null)
+    public function editorAction(HttpRequest $request, ProjectResponseView $responseView = NULL)
     {
         if (is_null($responseView))
             $responseView =
@@ -76,6 +76,9 @@ class NewsController extends ProjectAuthMappedController
      */
     public function addDraftAction(HttpRequest $request)
     {
+        if (!empty($request->getPostVar('newsId')))
+            return $this->saveDraftAction($request);
+
         /** @var  ProjectResponseView $responseView */
         $responseView = ProjectResponseView::create();
         $responseView->setOperation('add');
@@ -91,6 +94,12 @@ class NewsController extends ProjectAuthMappedController
         if (empty($rubric = $this->getRubricFromRequest($request)))
             $responseView->setError('rubrics', PlatformSaveArticleErrorEnum::getErrorRequiredRubric()->getName());
 
+        if ($this->getForm()->getError('title'))
+            $responseView->setError('title', $this->getForm()->getTextualErrorFor('title'));
+
+        if ($this->getForm()->getError('anons'))
+            $responseView->setError('anons', $this->getForm()->getTextualErrorFor('anons'));
+
         if ($this->getForm()->getError('text'))
             $responseView->setError('text', $this->getForm()->getTextualErrorFor('text'));
 
@@ -104,10 +113,9 @@ class NewsController extends ProjectAuthMappedController
             $responseView->setError('meta_keywords', $this->getForm()->getTextualErrorFor('meta_keywords'));
 
         if (!empty($responseView->getError()))
-            return $this->editorAction($request, $responseView->setSuccess(false));
+            return $this->editorAction($request, $responseView->setSuccess(FALSE));
 
         $createdAt = TimestampTZ::makeNow();
-
 
         $this->getModule()->getModuleObject()->setRequest(
             ModuleNewsAddOperationRequest::create()
@@ -132,7 +140,7 @@ class NewsController extends ProjectAuthMappedController
                 ->setMessage('resultMessage', PlatformArticleMessageEnum::saveMessage()->getName())
                 ->setData('title', PlatformArticleMessageEnum::saveTitle()->getName())
                 ->setData('newsId', $response->getNewsId())
-                ->setData('createdAt', $createdAt)
+                ->setData('createdAt', $createdAt->toString())
                 ->setTpl('news/message')
         );
     }
@@ -177,7 +185,7 @@ class NewsController extends ProjectAuthMappedController
             $responseView->setError('meta_keywords', $this->getForm()->getTextualErrorFor('meta_keywords'));
 
         if (!empty($responseView->getError()))
-            return $this->editorAction($request, $responseView->setSuccess(false));
+            return $this->editorAction($request, $responseView->setSuccess(FALSE));
 
         $this->getModule()->getModuleObject()->setRequest(
             ModuleNewsAddOperationRequest::create()
@@ -216,6 +224,7 @@ class NewsController extends ProjectAuthMappedController
      */
     public function getDraftAction(HttpRequest $request)
     {
+        $rubrics = array();
         $this->getModule()->getModuleObject()->setRequest(
             ModuleNewsGetOperationRequest::create()
                 ->setNewsId($request->getAttachedVar('newsId'))
@@ -238,8 +247,12 @@ class NewsController extends ProjectAuthMappedController
             ->setData('meta_keywords', $response->getMetaKeywords());
 
         foreach ($response->getRubrics()->getList() as $k => $v)
-            $responseView->setData($k, PlatformCommonRubric::dao()->getById($v)->getName());
+            $rubrics[$k] = array(
+                'short_name' => PlatformCommonRubric::dao()->getById($v)->getRubricData()->getShortName(),
+                'name' => PlatformCommonRubric::dao()->getById($v)->getName(),
+            );
 
+        $responseView->setData('rubrics', $rubrics);
         $responseView->setOperation('save');
         $responseView->setData('titlePage', PlatformNewsTitleEnum::saveNews()->getName());
 

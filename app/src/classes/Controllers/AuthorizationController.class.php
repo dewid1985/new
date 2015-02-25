@@ -11,7 +11,7 @@ class AuthorizationController extends ProjectMethodMappedController
 
     private $viewName = 'authorization/index';
 
-    protected $captcha = null;
+    protected $captcha = NULL;
 
     protected $fatalErrorCode = FALSE;
 

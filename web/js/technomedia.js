@@ -98,117 +98,433 @@ var getRubrics = function () {
 
 /**articles**/
 /**********************************************************************************************************************/
-var articles = $('#articles').dataTable(
-    {
-        "language": {
-            "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"
-        },
-        "bFilter": false,
-        "processing": true,
-        "serverSide": true,
-        "bSort": false,
-        "ajax": {
-            "url": "list",
-            "data": function (requestDataModifiedGET) {
-                delete requestDataModifiedGET.columns;
-                delete requestDataModifiedGET.order;
-                requestDataModifiedGET.title = $('#title').val();
-                requestDataModifiedGET.anons = $('#anons').val();
-                requestDataModifiedGET.text = $('#text').val();
-                requestDataModifiedGET.of_created_at = $('#of_created_at').val();
-                requestDataModifiedGET.to_created_at = $('#to_created_at').val();
-                requestDataModifiedGET.of_modified_at = $('#of_modified_at').val();
-                requestDataModifiedGET.to_modified_at = $('#to_modified_at').val();
-                requestDataModifiedGET.to_published_at = $('#to_published_at').val();
-                requestDataModifiedGET.of_published_at = $('#of_published_at').val();
+
+var Articles = {
+    url: getBaseUrl() + 'articles/',
+    table: $('#articles').dataTable(
+        {
+            "language": {
+                "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"
+            },
+            "bFilter": false,
+            "processing": true,
+            "serverSide": true,
+            "bSort": false,
+            "ajax": {
+                "url": "list",
+                "data": function (requestDataModifiedGET) {
+                    delete requestDataModifiedGET.columns;
+                    delete requestDataModifiedGET.order;
+                    requestDataModifiedGET.title = $('#title').val();
+                    requestDataModifiedGET.anons = $('#anons').val();
+                    requestDataModifiedGET.text = $('#text').val();
+                    requestDataModifiedGET.of_created_at = $('#of_created_at').val();
+                    requestDataModifiedGET.to_created_at = $('#to_created_at').val();
+                    requestDataModifiedGET.of_modified_at = $('#of_modified_at').val();
+                    requestDataModifiedGET.to_modified_at = $('#to_modified_at').val();
+                    requestDataModifiedGET.to_published_at = $('#to_published_at').val();
+                    requestDataModifiedGET.of_published_at = $('#of_published_at').val();
+                }
+            },
+            "columns": [
+                {"data": "id"},
+                {"data": "title"},
+                {"data": "author"},
+                {"data": "created_at"},
+                {"data": "modified_at"},
+                {"data": "published_at"},
+                {
+                    "data": null,
+                    "class": "center",
+                    "defaultContent": "<button class='btn btn-default btn-circle' type='button'>" +
+                    "<i class='glyphicon glyphicon-pencil'></i>" +
+                    "</button>"
+                }
+            ]
+        }
+    ),
+    init: function () {
+        $('#articles tbody').on('click', 'tr', function () {
+            $(this).toggleClass('selected');
+        });
+
+        $('#articles tbody').on('click', 'button', function () {
+            localStorage.setItem('articleId', Articles.table.api().row($(this).parents('tr')).data().id);
+            $(location).attr('href', Articles.url + 'editor');
+        });
+
+        $('#article_save').click(function () {
+            Articles.saveDialog($().technomedia.saveArticleDialog);
+        });
+
+        $('#search_article').click(function(){
+            Articles.reloadTable();
+        });
+
+        if (!!localStorage.getItem('articleId'))
+            this.get();
+    },
+    reloadTable: function () {
+        this.table.api().ajax.reload();
+    },
+    get: function () {
+        $.ajax({
+            type: "post",
+            url: Articles.url + 'get/' + localStorage.getItem('articleId') + '/json',
+            error: function () {
+                Articles.setMessageTpl($().technomedia.totalError)
+            },
+            beforeSend: function () {
+                $('#loading').modal('show');
+            },
+            complete: function () {
+                localStorage.removeItem('articleId');
+                $('#loading').modal('hide');
+            },
+            success: function (json) {
+                json = $.parseJSON(json);
+                tinymce.get('text').setContent(json.data.text);
+                $.each(json.data, function (k, v) {
+                    if (k == 'rubrics') {
+                        Articles.setRubricsTpl(v);
+                    } else {
+                        $('#' + k).val(v);
+                    }
+                })
             }
-        },
-        "columns": [
-            {"data": "id"},
-            {"data": "title"},
-            {"data": "author"},
-            {"data": "created_at"},
-            {"data": "modified_at"},
-            {"data": "published_at"},
-            {
-                "data": null,
-                "class": "center",
-                "defaultContent": "<button class='btn btn-default btn-circle' type='button'><i class='glyphicon glyphicon-pencil'></i></button>"
+        });
+    },
+    add: function () {
+        $.ajax({
+            type: "post",
+            url: Articles.url + 'add/json',
+            data: $('#article').serialize() + '&text=' + tinyMCE.get('text').getContent(),
+            error: function () {
+                Articles.setMessageTpl($().technomedia.totalError)
+            },
+            beforeSend: function () {
+                $('#loading').modal('show');
+            },
+            complete: function () {
+                $('#loading').modal('hide');
+            },
+            success: function (data) {
+                data = $.parseJSON(data);
+                if (false === data.success) {
+                    Articles.setErrorForm(data.errors);
+                } else {
+                    Articles.addArticlesMessageOk();
+                }
             }
-        ]
+        });
+    },
+    setErrorForm: function (errors) {
+        $.noty.closeAll();
+        $.each(errors, function (k, v) {
+            $('#' + k + '_warning').noty({
+                text: v,
+                type: 'warning',
+                dismissQueue: true,
+                layout: 'topCenter',
+                theme: 'defaultTheme',
+                maxVisible: 30
+            });
+        })
+    },
+    saveDialog: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-primary',
+                    text: $().technomedia.btnSaveOk,
+                    onClick: function (noty) {
+                        noty.close();
+                        Articles.add();
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnSaveCancel,
+                    onClick: function (noty) {
+                        noty.close();
+                    }
+                }
+            ]
+        });
+    },
+    addArticlesMessageOk: function () {
+        noty({
+            text: $().technomedia.addArticlesMessageOk,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-primary',
+                    text: $().technomedia.addArticlesMessageOkBtnList,
+                    onClick: function () {
+                        $(location).attr("href", Articles.url);
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.addArticlesMessageOkBtnNew,
+                    onClick: function () {
+                        $(location).attr("href", Articles.url + 'editor');
+                    }
+                }
+            ]
+        });
+    },
+    setMessageTpl: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnClose,
+                    onClick: function (noty) {
+                        noty.close();
+                    }
+                }
+            ]
+        });
+    },
+    setRubricsTpl: function (rubrics) {
+        var selectedDivRubric = $("#rubric");
+        $.each(rubrics, function (k, v) {
+            selectedDivRubric.append(
+                '<button id="' + v.name + '" class="btn btn-default btn-xs" onclick="deleteArticleRubric(' + v.name
+                + ')" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
+                '<input id="rubric_' + v.name + '" hidden="" name="' + k + '" value="' + v.name + '">'
+            );
+        });
     }
-);
-
-$('#articles tbody').on('click', 'tr', function () {
-    $(this).toggleClass('selected');
-});
-
-
-$('#articles tbody').on('click', 'button', function () {
-    var url = document.location.href + 'get/' + articles.api().row($(this).parents('tr')).data().id;
-    $(location).attr("href", url);
-
-});
-
-var reloadArticlesDataAjax = function () {
-    articles.api().ajax.reload()
 };
+
 
 /**news**/
 /**********************************************************************************************************************/
-var news = $('#news').dataTable(
-    {
-        "language": {
-            "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"
-        },
-        "bFilter": false,
-        "processing": true,
-        "serverSide": true,
-        "bSort": false,
-        "ajax": {
-            "url": "list",
-            "data": function (requestDataModifiedGET) {
-                delete requestDataModifiedGET.columns;
-                delete requestDataModifiedGET.order;
-                requestDataModifiedGET.title = $('#title').val();
-                requestDataModifiedGET.anons = $('#anons').val();
-                requestDataModifiedGET.text = $('#text').val();
-                requestDataModifiedGET.of_created_at = $('#of_created_at').val();
-                requestDataModifiedGET.to_created_at = $('#to_created_at').val();
-                requestDataModifiedGET.of_modified_at = $('#of_modified_at').val();
-                requestDataModifiedGET.to_modified_at = $('#to_modified_at').val();
-                requestDataModifiedGET.to_published_at = $('#to_published_at').val();
-                requestDataModifiedGET.of_published_at = $('#of_published_at').val();
+
+var News = {
+    url: getBaseUrl() + 'news/',
+    table: $('#news').dataTable(
+        {
+            "language": {
+                "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"
+            },
+            "bFilter": false,
+            "processing": true,
+            "serverSide": true,
+            "bSort": false,
+            "ajax": {
+                "url": "list",
+                "data": function (requestDataModifiedGET) {
+                    delete requestDataModifiedGET.columns;
+                    delete requestDataModifiedGET.order;
+                    requestDataModifiedGET.title = $('#title').val();
+                    requestDataModifiedGET.anons = $('#anons').val();
+                    requestDataModifiedGET.text = $('#text').val();
+                    requestDataModifiedGET.of_created_at = $('#of_created_at').val();
+                    requestDataModifiedGET.to_created_at = $('#to_created_at').val();
+                    requestDataModifiedGET.of_modified_at = $('#of_modified_at').val();
+                    requestDataModifiedGET.to_modified_at = $('#to_modified_at').val();
+                    requestDataModifiedGET.to_published_at = $('#to_published_at').val();
+                    requestDataModifiedGET.of_published_at = $('#of_published_at').val();
+                }
+            },
+            "columns": [
+                {"data": "id"},
+                {"data": "title"},
+                {"data": "created_at"},
+                {"data": "modified_at"},
+                {"data": "published_at"},
+                {
+                    "data": null,
+                    "class": "center",
+                    "defaultContent": "<button class='btn btn-default btn-circle' type='button'>" +
+                    "<i class='glyphicon glyphicon-pencil'></i>" +
+                    "</button>"
+                }
+            ]
+        }
+    ), init: function () {
+        $('#news tbody').on('click', 'tr', function () {
+            $(this).toggleClass('selected');
+        });
+
+        $('#news tbody').on('click', 'button', function () {
+            localStorage.setItem('newsId', News.table.api().row($(this).parents('tr')).data().id);
+            $(location).attr('href', News.url + 'editor');
+        });
+
+        $('#noun_save').click(function () {
+            News.saveDialog($().technomedia.saveNewsDialog);
+        });
+
+        $('#search_news').click(function(){
+            News.reloadTable();
+        });
+
+        if (!!localStorage.getItem('newsId'))
+            this.get();
+    },
+    reloadTable: function () {
+        this.table.api().ajax.reload();
+    },
+    get: function () {
+        $.ajax({
+            type: "post",
+            url: News.url + 'get/' + localStorage.getItem('newsId') + '/json',
+            error: function () {
+                News.setMessageTpl($().technomedia.totalError)
+            },
+            beforeSend: function () {
+                $('#loading').modal('show');
+            },
+            complete: function () {
+                localStorage.removeItem('newsId');
+                $('#loading').modal('hide');
+            },
+            success: function (json) {
+                json = $.parseJSON(json);
+                tinymce.get('text').setContent(json.data.text);
+                $.each(json.data, function (k, v) {
+                    if (k == 'rubrics') {
+                        Articles.setRubricsTpl(v);
+                    } else {
+                        $('#' + k).val(v);
+                    }
+                })
             }
-        },
-        "columns": [
-            {"data": "id"},
-            {"data": "title"},
-            {"data": "created_at"},
-            {"data": "modified_at"},
-            {"data": "published_at"},
-            {
-                "data": null,
-                "class": "center",
-                "defaultContent": "<button class='btn btn-default btn-circle' type='button'><i class='glyphicon glyphicon-pencil'></i></button>"
+        });
+    },
+    add: function () {
+        $.ajax({
+            type: "post",
+            url: News.url + 'add/json',
+            data: $('#noun').serialize() + '&text=' + tinyMCE.get('text').getContent(),
+            error: function () {
+                News.setMessageTpl($().technomedia.totalError)
+            },
+            beforeSend: function () {
+                $('#loading').modal('show');
+            },
+            complete: function () {
+                $('#loading').modal('hide');
+            },
+            success: function (data) {
+                data = $.parseJSON(data);
+                if (false === data.success) {
+                    News.setErrorForm(data.errors);
+                } else {
+                    News.addNewsMessageOk();
+                }
             }
-        ]
+        });
+    },
+    setErrorForm: function (errors) {
+        $.noty.closeAll();
+        $.each(errors, function (k, v) {
+            $('#' + k + '_warning').noty({
+                text: v,
+                type: 'warning',
+                dismissQueue: true,
+                layout: 'topCenter',
+                theme: 'defaultTheme',
+                maxVisible: 30
+            });
+        })
+    },
+    saveDialog: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-primary',
+                    text: $().technomedia.btnSaveOk,
+                    onClick: function (noty) {
+                        noty.close();
+                        News.add();
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnSaveCancel,
+                    onClick: function (noty) {
+                        noty.close();
+                    }
+                }
+            ]
+        });
+    },
+    addNewsMessageOk: function () {
+        noty({
+            text: $().technomedia.addNewsMessageOk,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-primary',
+                    text: $().technomedia.addNewsMessageOkBtnList,
+                    onClick: function () {
+                        $(location).attr("href", News.url);
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.addNewsMessageOkBtnNew,
+                    onClick: function () {
+                        $(location).attr("href", News.url + 'editor');
+                    }
+                }
+            ]
+        });
+    },
+    setMessageTpl: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnClose,
+                    onClick: function (noty) {
+                        noty.close();
+                    }
+                }
+            ]
+        });
+    },
+    setRubricsTpl: function (rubrics) {
+        var selectedDivRubric = $("#rubric");
+        $.each(rubrics, function (k, v) {
+            selectedDivRubric.append(
+                '<button id="' + v.name + '" class="btn btn-default btn-xs" onclick="deleteArticleRubric(' + v.name
+                + ')" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
+                '<input id="rubric_' + v.name + '" hidden="" name="' + k + '" value="' + v.name + '">'
+            );
+        });
     }
-);
-
-$('#news tbody').on('click', 'tr', function () {
-    $(this).toggleClass('selected');
-});
-
-
-$('#news tbody').on('click', 'button', function () {
-    var url = document.location.href + 'get/' + news.api().row($(this).parents('tr')).data().id;
-    $(location).attr("href", url);
-
-});
-
-var reloadNewsDataAjax = function () {
-    news.api().ajax.reload()
 };
 
 /**********************************************************************************************************************/
@@ -236,7 +552,14 @@ var Rubric = {
                 {"data": "path"},
                 {"data": "description"},
                 {"data": "created_at"},
-                {"data": "modified_at"}
+                {"data": "modified_at"},
+                {
+                    "data": null,
+                    "class": "center",
+                    "defaultContent": "<button class='btn btn-default btn-circle' type='button'>" +
+                    "<i class='glyphicon glyphicon-pencil'></i>" +
+                    "</button>"
+                }
             ]
         }
     ),
@@ -246,16 +569,13 @@ var Rubric = {
         $('#addRubric').click(function () {
             if ($('#rubric_id').val().length == 0) {
                 Rubric.setMessageSave($().technomedia.saveRubricDialogMessage);
-
             } else {
                 Rubric.setMessageSave($().technomedia.updateRubricDialogMessage);
             }
         });
 
-        $('#edit').click(function () {
-            if (!Rubric.table.api().row('.selected').length)
-                return Rubric.setMessageTpl($().technomedia.selectedRubric);
-            RubricId = Rubric.table.api().row('.selected').data().id;
+        $('#rubrics tbody').on('click', 'button', function () {
+            RubricId = Rubric.table.api().row($(this).parents('tr')).data().id;
             Rubric.clear();
             $.getJSON(getBaseUrl() + 'rubrics/get/' + RubricId, function (json) {
                 if (json.success == false)
@@ -273,6 +593,7 @@ var Rubric = {
         });
 
         $('#saveRubric').click(function () {
+            Rubric.clear();
             Rubric.add();
         });
 
@@ -293,29 +614,29 @@ var Rubric = {
             }
         });
 
-        $('#add').click(function(){
+        $('#add').click(function () {
+            Rubric.clear();
             $('#rubric-row').animate({height: 'show'}, 500);
         });
 
-        $('#closeAddRubric').click(function(){
+        $('#closeAddRubric').click(function () {
             $('#rubric-row').animate({height: 'hide'}, 500);
         });
     },
     add: function () {
-        $("div[data-id='error']").empty()
+        $("div[data-id='error']").empty();
         $.ajax({
             type: "POST",
             url: 'add/json',
             data: $('#rubric').serialize(),
             error: function () {
-                Rubric.setMessageTpl($().technomedia.totalRubricError)
+                Rubric.setMessageTpl($().technomedia.totalError)
             },
             beforeSend: function () {
                 $('#loading').modal('show');
             },
             complete: function () {
                 Rubric.table.api().ajax.reload();
-                Rubric.setRubric();
                 $('#loading').modal('hide');
             },
             success: function (data) {
@@ -328,9 +649,10 @@ var Rubric = {
                         Rubric.clear();
                     }
                 } catch (e) {
-                    Rubric.setMessageTpl($().technomedia.totalRubricError);
+                    Rubric.setMessageTpl($().technomedia.totalError);
                     Rubric.clear();
                 }
+                $('#rubric-row').animate({height: 'hide'}, 500);
                 $('body,html').animate({scrollTop: 0}, 500);
             }
         });
@@ -349,7 +671,7 @@ var Rubric = {
 
             $('#' + k + '_warning').noty({
                 text: v,
-                type: 'information',
+                type: 'warning',
                 dismissQueue: true,
                 layout: 'topCenter',
                 theme: 'defaultTheme',
@@ -369,8 +691,8 @@ var Rubric = {
                 {
                     addClass: 'btn btn-danger',
                     text: $().technomedia.btnClose,
-                    onClick: function ($noty) {
-                        $noty.close();
+                    onClick: function (noty) {
+                        noty.close();
                     }
                 }
             ]
@@ -412,5 +734,6 @@ var Rubric = {
     }
 };
 
+News.init();
+Articles.init();
 Rubric.init();
-
