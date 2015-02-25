@@ -593,7 +593,6 @@ var Rubric = {
         });
 
         $('#saveRubric').click(function () {
-            Rubric.clear();
             Rubric.add();
         });
 
@@ -615,7 +614,6 @@ var Rubric = {
         });
 
         $('#add').click(function () {
-            Rubric.clear();
             $('#rubric-row').animate({height: 'show'}, 500);
         });
 
@@ -652,7 +650,6 @@ var Rubric = {
                     Rubric.setMessageTpl($().technomedia.totalError);
                     Rubric.clear();
                 }
-                $('#rubric-row').animate({height: 'hide'}, 500);
                 $('body,html').animate({scrollTop: 0}, 500);
             }
         });
