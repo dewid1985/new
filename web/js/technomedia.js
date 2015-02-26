@@ -1,5 +1,7 @@
 $(function () {
-    $('#side-menu').metisMenu();
+    $('#side-menu').metisMenu({
+        //toggle: false
+    });
 });
 
 $.fn.exists = function () {
@@ -86,14 +88,14 @@ var deleteArticleRubric = function (idRubric) {
     $("#rubric_" + idRubric.id).remove();
 };
 
-var getRubrics = function () {
+$('#get_rubrics').click(function () {
     $('option', $("#rubricName")).remove();
     $.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
         $.each(json.data, function (id, name) {
             $('#rubricName').append('<option data-id="' + id + '">' + name + '</option>');
         });
     });
-};
+});
 
 
 /**articles**/
@@ -154,10 +156,12 @@ var Articles = {
         });
 
         $('#article_save').click(function () {
+            $(':button,  :input, #article_save').attr('disabled', true);
+            tinyMCE.get('text').getBody().setAttribute('contenteditable', false);
             Articles.saveDialog($().technomedia.saveArticleDialog);
         });
 
-        $('#search_article').click(function(){
+        $('#search_article').click(function () {
             Articles.reloadTable();
         });
 
@@ -195,6 +199,9 @@ var Articles = {
         });
     },
     add: function () {
+        $.noty.closeAll();
+        $(':button,  :input, #article_save').attr('disabled', false);
+        tinyMCE.get('text').getBody().setAttribute('contenteditable', true);
         $.ajax({
             type: "post",
             url: Articles.url + 'add/json',
@@ -213,16 +220,19 @@ var Articles = {
                 if (false === data.success) {
                     Articles.setErrorForm(data.errors);
                 } else {
+                    $(':button,  :input, #article_save').attr('disabled', true);
+                    tinyMCE.get('text').getBody().setAttribute('contenteditable', false);
                     Articles.addArticlesMessageOk();
                 }
             }
         });
+
     },
     setErrorForm: function (errors) {
         $.noty.closeAll();
         $.each(errors, function (k, v) {
             $('#' + k + '_warning').noty({
-                text: v,
+                text: '<i class="glyphicon glyphicon-exclamation-sign"></i> ' + v,
                 type: 'warning',
                 dismissQueue: true,
                 layout: 'topCenter',
@@ -252,6 +262,8 @@ var Articles = {
                     text: $().technomedia.btnSaveCancel,
                     onClick: function (noty) {
                         noty.close();
+                        $(':button,  :input, #article_save').attr('disabled', false);
+                        tinyMCE.get('text').getBody().setAttribute('contenteditable', true);
                     }
                 }
             ]
@@ -369,10 +381,12 @@ var News = {
         });
 
         $('#noun_save').click(function () {
+            $(':button,  :input, #noun_save').attr('disabled', true);
+            tinyMCE.get('text').getBody().setAttribute('contenteditable', false);
             News.saveDialog($().technomedia.saveNewsDialog);
         });
 
-        $('#search_news').click(function(){
+        $('#search_news').click(function () {
             News.reloadTable();
         });
 
@@ -401,7 +415,7 @@ var News = {
                 tinymce.get('text').setContent(json.data.text);
                 $.each(json.data, function (k, v) {
                     if (k == 'rubrics') {
-                        Articles.setRubricsTpl(v);
+                        News.setRubricsTpl(v);
                     } else {
                         $('#' + k).val(v);
                     }
@@ -410,6 +424,8 @@ var News = {
         });
     },
     add: function () {
+        $(':button,  :input, #noun_save').attr('disabled', false);
+        tinyMCE.get('text').getBody().setAttribute('contenteditable', true);
         $.ajax({
             type: "post",
             url: News.url + 'add/json',
@@ -426,8 +442,11 @@ var News = {
             success: function (data) {
                 data = $.parseJSON(data);
                 if (false === data.success) {
+                    $(":button, #noun_save").attr('disabled', false);
                     News.setErrorForm(data.errors);
                 } else {
+                    $(':button,  :input, #noun_save').attr('disabled', true);
+                    tinyMCE.get('text').getBody().setAttribute('contenteditable', false);
                     News.addNewsMessageOk();
                 }
             }
@@ -437,7 +456,7 @@ var News = {
         $.noty.closeAll();
         $.each(errors, function (k, v) {
             $('#' + k + '_warning').noty({
-                text: v,
+                text: '<i class="glyphicon glyphicon-exclamation-sign"></i> ' + v,
                 type: 'warning',
                 dismissQueue: true,
                 layout: 'topCenter',
@@ -467,6 +486,8 @@ var News = {
                     text: $().technomedia.btnSaveCancel,
                     onClick: function (noty) {
                         noty.close();
+                        $(':button,  :input, #noun_save').attr('disabled', false);
+                        tinyMCE.get('text').getBody().setAttribute('contenteditable', true);
                     }
                 }
             ]
@@ -567,11 +588,8 @@ var Rubric = {
         $("#rubric-row").hide();
 
         $('#addRubric').click(function () {
-            if ($('#rubric_id').val().length == 0) {
-                Rubric.setMessageSave($().technomedia.saveRubricDialogMessage);
-            } else {
-                Rubric.setMessageSave($().technomedia.updateRubricDialogMessage);
-            }
+            $(':button,  :input, #addRubric').attr('disabled', true);
+            Rubric.setMessageSave($().technomedia.saveRubricDialogMessage);
         });
 
         $('#rubrics tbody').on('click', 'button', function () {
@@ -592,10 +610,6 @@ var Rubric = {
             $('body,html').animate({scrollTop: 0}, 500);
         });
 
-        $('#saveRubric').click(function () {
-            Rubric.add();
-        });
-
         $('#clearForm').click(function () {
             $.noty.closeAll();
             Rubric.clear();
@@ -614,15 +628,18 @@ var Rubric = {
         });
 
         $('#add').click(function () {
+            Rubric.clear();
             $('#rubric-row').animate({height: 'show'}, 500);
         });
 
-        $('#closeAddRubric').click(function () {
+        $('#closeAddRubric, #turn').click(function () {
             $('#rubric-row').animate({height: 'hide'}, 500);
         });
     },
     add: function () {
         $("div[data-id='error']").empty();
+        $.noty.closeAll();
+        $(':button,  :input, #addRubric').attr('disabled', false);
         $.ajax({
             type: "POST",
             url: 'add/json',
@@ -653,6 +670,8 @@ var Rubric = {
                 $('body,html').animate({scrollTop: 0}, 500);
             }
         });
+        $('#addRubric, #add').attr('disabled', false);
+
     },
     clear: function () {
         $('#rubric')[0].reset();
@@ -667,7 +686,7 @@ var Rubric = {
                 Rubric.setMessageTpl(v);
 
             $('#' + k + '_warning').noty({
-                text: v,
+                text: '<i class="glyphicon glyphicon-exclamation-sign"></i> ' + v,
                 type: 'warning',
                 dismissQueue: true,
                 layout: 'topCenter',
@@ -715,6 +734,7 @@ var Rubric = {
                     addClass: 'btn btn-danger',
                     text: $().technomedia.btnSaveCancel,
                     onClick: function ($noty) {
+                        $(':button,  :input, #addRubric').attr('disabled', false);
                         $noty.close();
                     }
                 }

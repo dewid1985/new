@@ -58,7 +58,6 @@ try {
         ->setServer($_SERVER)
         ->setFiles($_FILES);
 
-
     if (!empty($_SESSION)) {
         $request->setSession($_SESSION);
     }

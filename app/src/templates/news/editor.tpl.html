@@ -17,6 +17,7 @@
             <form id="noun" method="post">
                 <div class="panel-body">
                     <input id="newsId" hidden="" value="" name="newsId">
+
                     <div class="form-group">
                         <label for="" data-toggle="tooltip" data-placement="top"
                                title="Загловок статьи. Поле обязательно для сохранения!"> Заголовок
@@ -55,8 +56,8 @@
                                title="Выбор рубрики для статьи. Статья принадлежит как минимум 1-ой рубрики максимум к 3">
                             Рубрики
                         </label>
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"
-                                onclick="getRubrics()">
+                        <button id="get_rubrics" type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#myModal">
                             Привязать к рубрике
                         </button>
                     </div>
@@ -75,6 +76,7 @@
                         <label for="openDate" data-toggle="tooltip" data-placement="top"
                                title="Поле обязательно для сохранения!">
                             Время публикации статьи</label>
+
                         <div class="input-group date form_datetime col-md-5" data-date=""
                              data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
                             <input id="published_at" class="form-control" size="16" name="published_at" type="text"
