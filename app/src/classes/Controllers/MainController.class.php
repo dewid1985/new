@@ -13,7 +13,6 @@ class MainController implements Controller
      */
     public function handleRequest(HttpRequest $request)
     {
-
         return ModelAndView::create()
             ->setModel(Model::create())
             ->setView(RedirectView::create('/auth'));

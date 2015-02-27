@@ -549,7 +549,6 @@ var News = {
 };
 
 /**********************************************************************************************************************/
-
 var Rubric = {
     table: $('#rubrics').dataTable(
         {
@@ -592,30 +591,12 @@ var Rubric = {
             Rubric.setMessageSave($().technomedia.saveRubricDialogMessage);
         });
 
-        $('#rubrics tbody').on('click', 'button', function () {
-            RubricId = Rubric.table.api().row($(this).parents('tr')).data().id;
-            Rubric.clear();
-            $.getJSON(getBaseUrl() + 'rubrics/get/' + RubricId, function (json) {
-                if (json.success == false)
-                    return Rubric.setMessageTpl($().technomedia.totalRubricError);
-                $.each(json.data, function (field, value) {
-                    if (field === 'parent') {
-                        $("#parent [data-id='" + value + "']").attr('selected', true);
-                    } else {
-                        $('#' + field).val(value);
-                    }
-                });
-            });
-            $('#rubric-row').animate({height: 'show'}, 500);
-            $('body,html').animate({scrollTop: 0}, 500);
-        });
-
         $('#clearForm').click(function () {
             $.noty.closeAll();
             Rubric.clear();
         });
 
-        if ($('#parent').exists()) Rubric.setRubric();
+        if ($('#parent').exists()) this.setRubric();
 
         $('#rubrics tbody').on('click', 'tr', function () {
             if ($(this).hasClass('selected')) {
@@ -635,6 +616,26 @@ var Rubric = {
         $('#closeAddRubric, #turn').click(function () {
             $('#rubric-row').animate({height: 'hide'}, 500);
         });
+
+        $('#rubrics tbody').on('click', 'button', function () {
+            RubricId = Rubric.table.api().row($(this).parents('tr')).data().id;
+            Rubric.clear();
+            Rubric.setRubric();
+            $.getJSON(getBaseUrl() + 'rubrics/get/' + RubricId, function (json) {
+                if (json.success == false)
+                    return Rubric.setMessageTpl($().technomedia.totalRubricError);
+                $.each(json.data, function (field, value) {
+                    if (field === 'parent') {
+                        $("#parent [data-id='" + value + "']").attr('selected', true);
+                    } else {
+                        $('#' + field).val(value);
+                    }
+                });
+            });
+            $('#rubric-row').animate({height: 'show'}, 500);
+            $('body,html').animate({scrollTop: 0}, 500);
+        });
+
     },
     add: function () {
         $("div[data-id='error']").empty();
@@ -675,9 +676,6 @@ var Rubric = {
     },
     clear: function () {
         $('#rubric')[0].reset();
-        $('#parent option:selected').each(function () {
-            this.selected = false;
-        });
     },
     setErrorForm: function (error) {
         $.each(error, function (k, v) {
@@ -754,3 +752,4 @@ var Rubric = {
 News.init();
 Articles.init();
 Rubric.init();
+
