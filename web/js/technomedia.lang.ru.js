@@ -19,5 +19,7 @@ $.fn.technomedia = {
     saveNewsDialog:['Сохранить новость?'],
     addNewsMessageOk:['Новость успешно сохраненна'],
     addNewsMessageOkBtnList:['Список новостей'],
-    addNewsMessageOkBtnNew:['Новая `Новость`']
+    addNewsMessageOkBtnNew:['Новая `Новость`'],
+    selectedRubricErrorMax:['Превышенно количество рубрик! Материал можно максимально привязать к трем рубрикам'],
+    noSelectedRubricError:['Вы не выбрали рубрики!']
 };

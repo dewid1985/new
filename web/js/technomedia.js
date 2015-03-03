@@ -4,6 +4,7 @@ $(function () {
     });
 });
 
+
 $.fn.exists = function () {
     return $(this).length;
 };
@@ -83,19 +84,19 @@ var getId = function (countRubricDiv) {
     return getId(countRubricDiv + 2);
 };
 
-var deleteArticleRubric = function (idRubric) {
-    $("#" + idRubric.id).remove();
-    $("#rubric_" + idRubric.id).remove();
-};
+//var deleteArticleRubric = function (idRubric) {
+//    $("#" + idRubric.id).remove();
+//    $("#rubric_" + idRubric.id).remove();
+//};
 
-$('#get_rubrics').click(function () {
-    $('option', $("#rubricName")).remove();
-    $.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
-        $.each(json.data, function (id, name) {
-            $('#rubricName').append('<option data-id="' + id + '">' + name + '</option>');
-        });
-    });
-});
+//$('#get_rubrics').click(function () {
+//    $('option', $("#rubricName")).remove();
+//    $.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
+//        $.each(json.data, function (id, name) {
+//            $('#rubricName').append('<option data-id="' + id + '">' + name + '</option>');
+//        });
+//    });
+//});
 
 
 /**articles**/
@@ -172,9 +173,11 @@ var Articles = {
         this.table.api().ajax.reload();
     },
     get: function () {
+        var articleId = localStorage.getItem('articleId');
+        localStorage.removeItem('articleId');
         $.ajax({
             type: "post",
-            url: Articles.url + 'get/' + localStorage.getItem('articleId') + '/json',
+            url: Articles.url + 'get/' + articleId + '/json',
             error: function () {
                 Articles.setMessageTpl($().technomedia.totalError)
             },
@@ -182,7 +185,6 @@ var Articles = {
                 $('#loading').modal('show');
             },
             complete: function () {
-                localStorage.removeItem('articleId');
                 $('#loading').modal('hide');
             },
             success: function (json) {
@@ -316,9 +318,8 @@ var Articles = {
         var selectedDivRubric = $("#rubric");
         $.each(rubrics, function (k, v) {
             selectedDivRubric.append(
-                '<button id="' + v.name + '" class="btn btn-default btn-xs" onclick="deleteArticleRubric(' + v.name
-                + ')" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
-                '<input id="rubric_' + v.name + '" hidden="" name="' + k + '" value="' + v.name + '">'
+                '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
+                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name+'" name="' + k + '" value="' + v.name + '">'
             );
         });
     }
@@ -397,9 +398,11 @@ var News = {
         this.table.api().ajax.reload();
     },
     get: function () {
+        var newsId = localStorage.getItem('newsId');
+        localStorage.removeItem('newsId');
         $.ajax({
             type: "post",
-            url: News.url + 'get/' + localStorage.getItem('newsId') + '/json',
+            url: News.url + 'get/' + newsId + '/json',
             error: function () {
                 News.setMessageTpl($().technomedia.totalError)
             },
@@ -412,6 +415,7 @@ var News = {
             },
             success: function (json) {
                 json = $.parseJSON(json);
+                console.log(json);
                 tinymce.get('text').setContent(json.data.text);
                 $.each(json.data, function (k, v) {
                     if (k == 'rubrics') {
@@ -540,9 +544,8 @@ var News = {
         var selectedDivRubric = $("#rubric");
         $.each(rubrics, function (k, v) {
             selectedDivRubric.append(
-                '<button id="' + v.name + '" class="btn btn-default btn-xs" onclick="deleteArticleRubric(' + v.name
-                + ')" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
-                '<input id="rubric_' + v.name + '" hidden="" name="' + k + '" value="' + v.name + '">'
+                '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
+                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name+'" name="' + k + '" value="' + v.name + '">'
             );
         });
     }
@@ -596,9 +599,8 @@ var Rubric = {
             Rubric.clear();
         });
 
-        if ($('#parent').exists()) this.setRubric();
-
         $('#rubrics tbody').on('click', 'tr', function () {
+
             if ($(this).hasClass('selected')) {
                 $(this).removeClass('selected');
             }
@@ -610,6 +612,7 @@ var Rubric = {
 
         $('#add').click(function () {
             Rubric.clear();
+            Rubric.setRubric();
             $('#rubric-row').animate({height: 'show'}, 500);
         });
 
@@ -617,34 +620,80 @@ var Rubric = {
             $('#rubric-row').animate({height: 'hide'}, 500);
         });
 
+        if ($('#tree').exists()) {
+            this.setRubric();
+        }
+
+        $('#tree').on('click', 'a', function () {
+            $('.tree a[class=selected-tree]').each(function () {
+                $(this).removeClass('selected-tree')
+            });
+            if ($(this).hasClass('selected-tree')) {
+                $(this).removeClass('selected-tree');
+            }
+            else {
+                $(this).addClass('selected-tree');
+            }
+        });
+
         $('#rubrics tbody').on('click', 'button', function () {
             RubricId = Rubric.table.api().row($(this).parents('tr')).data().id;
-            Rubric.clear();
-            Rubric.setRubric();
             $.getJSON(getBaseUrl() + 'rubrics/get/' + RubricId, function (json) {
                 if (json.success == false)
                     return Rubric.setMessageTpl($().technomedia.totalRubricError);
                 $.each(json.data, function (field, value) {
                     if (field === 'parent') {
-                        $("#parent [data-id='" + value + "']").attr('selected', true);
+                        $('.tree a').each(function () {
+                            $(this).removeClass('selected-tree')
+                        });
+                        $(".tree a[data-id~='" + value + "']").addClass('selected-tree');
                     } else {
                         $('#' + field).val(value);
                     }
                 });
             });
+
             $('#rubric-row').animate({height: 'show'}, 500);
             $('body,html').animate({scrollTop: 0}, 500);
-        });
 
+        });
+    },
+    insertRubricTpl: function (ulId, data) {
+        $(data).each(function (key, value) {
+            var defaultIcon = ' <span class="fa fa-sitemap fa-fw"></span>';
+            if ($(value.data).length > 0) {
+                defaultIcon = '<span class="fa fa-folder-o"></span>';
+                $('#' + ulId).append(
+                    '<li>' +
+                    '<a  data-id=' + value.dataId + '>' +
+                    defaultIcon + value.value + '</a>' +
+                    '<ul id="' + value.dataId + '">'
+                );
+                Rubric.insertRubricTpl(value.dataId, value.data)
+            } else {
+                $('#' + ulId).append(
+                    '<li>' +
+                    '<a  data-id=' + value.dataId + ' >' + defaultIcon + value.value +
+                    '</a>' +
+                    '</li>'
+                );
+            }
+        });
     },
     add: function () {
         $("div[data-id='error']").empty();
+
+        var parent = $('.tree a[class=selected-tree]').attr('data-id');
+        if (undefined === parent) {
+            parent = null;
+        }
+
         $.noty.closeAll();
         $(':button,  :input, #addRubric').attr('disabled', false);
         $.ajax({
             type: "POST",
             url: 'add/json',
-            data: $('#rubric').serialize(),
+            data: $('#rubric').serialize() + '&parent=' + parent,
             error: function () {
                 Rubric.setMessageTpl($().technomedia.totalError)
             },
@@ -672,7 +721,6 @@ var Rubric = {
             }
         });
         $('#addRubric, #add').attr('disabled', false);
-
     },
     clear: function () {
         $('#rubric')[0].reset();
@@ -706,6 +754,7 @@ var Rubric = {
                     addClass: 'btn btn-danger',
                     text: $().technomedia.btnClose,
                     onClick: function (noty) {
+                        Rubric.setRubric();
                         noty.close();
                     }
                 }
@@ -740,15 +789,132 @@ var Rubric = {
         });
     },
     setRubric: function () {
-        $.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
-            $('option', $("#parent")).remove();
-            $.each(json.data, function (id, name) {
-                $('#parent').append('<option data-id="' + id + '">' + name + '</option>');
-            })
-        })
+        $('.tree').empty();
+        $.ajax({
+            type: "post",
+            url: getBaseUrl() + 'rubrics/get',
+            complete: function () {
+                $('#rubric .btn-default').each(function () {
+                    $('#selected-rubric a[data-id =' + $(this).attr('data-id') + ']').addClass('selected-tree');
+                })
+            },
+            success: function (data) {
+                var json  = $.parseJSON(data);
+                $(json.data.rubrics).each(function (k, v) {
+                    var defaultIcon = ' <span class="fa fa-sitemap fa-fw"></span>';
+                    if ($(v.data).length > 0) {
+                        defaultIcon = '<span class="fa fa-folder-o"></span>';
+                    }
+                    $('.tree').append(
+                        '<li>' +
+                        '<a data-id=' + v.dataId + ' >' +
+                        defaultIcon + v.value + '</a>' +
+                        '<ul id="' + v.dataId + '">'
+                    );
+                    if ($(v.data).length > 0) {
+                        Rubric.insertRubricTpl(v.dataId, v.data);
+                    }
+                });
+            }
+
+        });
+
+        //$.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
+        //    $(json.data.rubrics).each(function (k, v) {
+        //        var defaultIcon = ' <span class="fa fa-sitemap fa-fw"></span>';
+        //        if ($(v.data).length > 0) {
+        //            defaultIcon = '<span class="fa fa-folder-o"></span>';
+        //        }
+        //        $('.tree').append(
+        //            '<li>' +
+        //            '<a data-id=' + v.dataId + ' >' +
+        //            defaultIcon + v.value + '</a>' +
+        //            '<ul id="' + v.dataId + '">'
+        //        );
+        //        if ($(v.data).length > 0) {
+        //            Rubric.insertRubricTpl(v.dataId, v.data);
+        //        }
+        //    });
+        //});
     }
 };
 
+var SelectedRubric = {
+    init: function () {
+        $('#get_rubrics').click(function () {
+            Rubric.setRubric();
+        });
+
+        $('#selected-rubric').on('click', 'a', function () {
+            $.noty.closeAll();
+            if ($(this).hasClass('selected-tree')) {
+                $(this).removeClass('selected-tree');
+            }
+            else {
+                if ($('#selected-rubric a[class=selected-tree]').length == 3) {
+                    return SelectedRubric.message($().technomedia.selectedRubricErrorMax);
+                }
+                $(this).addClass('selected-tree');
+            }
+        });
+
+        $('#rubric').on('click', 'button', function () {
+            if ($(this).attr('id') == 'get_rubrics')
+                return;
+            $('#rubric input[data-id=' + $(this).attr('data-id') + ']').remove();
+            $(this).remove();
+        });
+
+        $('#relatedTo').click(function () {
+            SelectedRubric.relatedTo();
+        })
+    },
+    message: function (message) {
+        $('#selected-rubric-message').noty({
+            text: '<i class="glyphicon glyphicon-exclamation-sign"></i> ' + message,
+            type: 'warning',
+            dismissQueue: true,
+            layout: 'topCenter',
+            theme: 'defaultTheme',
+            maxVisible: 30
+        });
+    }
+
+    ,
+    relatedTo: function () {
+
+        if ($('#selected-rubric a[class=selected-tree]').length == 0) {
+            $.noty.closeAll();
+            return this.message($().technomedia.noSelectedRubricError)
+        }
+        var i = 1;
+
+        $('#rubric .btn-default').each(function () {
+            $(this).remove();
+        });
+
+        $('#selected-rubric a[class=selected-tree]').each(function () {
+
+            if ($('#rubric button[data-id=' + $(this).attr('data-id') + ']').length == 1)
+                return;
+
+            $("#rubric").append('<button type="button" style="margin-right: 3px" '
+            + 'class="btn btn-default btn-xs"  data-id="'
+            + $(this).attr('data-id') +
+            '">' + $(this).text() + ' &times;</button>');
+
+            $("#rubric").append('<input id="rubric_'
+            + $(this).attr('data-id') + '" data-id="' + $(this).attr('data-id')
+            + '" hidden value="'
+            + $(this).attr('data-id') +
+            '" name="rubric_' + i + '"/>');
+            i++;
+        })
+
+    }
+};
+
+SelectedRubric.init();
 News.init();
 Articles.init();
 Rubric.init();

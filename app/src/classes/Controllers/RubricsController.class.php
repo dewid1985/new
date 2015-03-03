@@ -111,7 +111,7 @@ class RubricsController extends ProjectAuthMappedController
 
         $requestModule = ModuleRubricsAddOperationRequest::create();
 
-        if (array_key_exists('parent', $request->getPost()))
+        if (!is_null($request->getPostVar('parent')))
             $requestModule->setParent($request->getPostVar('parent'));
 
         $this->getModule()->getModuleObject()->setRequest(
@@ -160,7 +160,7 @@ class RubricsController extends ProjectAuthMappedController
 
         $requestModule = ModuleRubricsSaveOperationRequest::create();
 
-        if (array_key_exists('parent', $request->getPost()))
+        if (!is_null($request->getPostVar('parent')))
             $requestModule->setParent($request->getPostVar('parent'));
 
         $this->getModule()->getModuleObject()->setRequest(
@@ -218,14 +218,15 @@ class RubricsController extends ProjectAuthMappedController
         /** @var ModuleRubricsGetAllListOperationResponse $response */
         $response = $this->getModule()->getModuleObject()->getResponse();
 
-        foreach ($response->getData() as $key => $rubric) {
-            if ($key == 0) continue;
-            /** @var PlatformCommonRubric $rubric */
-            $responseView->setData(
-                $rubric->getName(),
-                $this->replacedBySpace($rubric->getPath()) . $rubric->getRubricData()->getShortName()
-            );
-        };
+        $responseView->setData('rubrics',$response->getData());
+//        foreach ($response->getData() as $key => $rubric) {
+//            if ($key == 0) continue;
+//            /** @var PlatformCommonRubric $rubric */
+//            $responseView->setData(
+//                $rubric->getName(),
+//                $this->replacedBySpace($rubric->getPath()) . $rubric->getRubricData()->getShortName()
+//            );
+//        };
 
         return $this->getModelAndView(
             $responseView

@@ -55,8 +55,12 @@
                         </div>
                         <div class="form-group">
                             <label for="exampleInputEmail1">Родительская рубрика</label>
-                            <select multiple id="parent" class="form-control" name="parent">
-                            </select>
+                            <nav class="nav">
+                                <ul id="tree" class="tree">
+                                </ul>
+                            </nav>
+                            <!--                            <select multiple id="parent" class="form-control" name="parent">-->
+                            <!--                            </select>-->
                         </div>
                         <div id="parent_warning" data-id="error">
                         </div>
@@ -64,7 +68,7 @@
                         </div>
                     </div>
                     <div class="panel-footer">
-<!--                        <div id="turn" class="btn btn-default">Скрыть</div>-->
+                        <!--                        <div id="turn" class="btn btn-default">Скрыть</div>-->
                         <div id="addRubric" type="button" class="btn btn-primary">
                             <i class="fa fa-save fa-fw"></i>
                             Сохранить
