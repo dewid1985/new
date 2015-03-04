@@ -57,7 +57,8 @@
                                    title="Статья принадлежит как минимум 1-ой рубрики максимум к 3-м">
                                 Рубрики
                             </label>
-                            <button id="get_rubrics" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                            <button id="get_rubrics" type="button" class="btn btn-primary" data-toggle="modal"
+                                    data-target="#myModal">
                                 Привязать к рубрике
                             </button>
                         </div>
@@ -84,14 +85,8 @@
                             <label for="openDate" data-toggle="tooltip" data-placement="top"
                                    title="Поле обязательно для сохранения!">
                                 Время публикации статьи</label>
-
-                            <div class="input-group date form_datetime col-md-5" data-date=""
-                                 data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
-                                <input class="form-control" size="16" name="published_at" id="published_at" type="text"
-                                       readonly>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                            <input type="hidden" id="timeOfPublication" value=""/>
+                            <input type="text" class="form-control date" name="published_at" id="published_at"
+                                   required="">
                         </div>
                         <div id="published_at_warning" data-id="error">
                         </div>

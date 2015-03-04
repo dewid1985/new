@@ -76,14 +76,9 @@
                         <label for="openDate" data-toggle="tooltip" data-placement="top"
                                title="Поле обязательно для сохранения!">
                             Время публикации статьи</label>
+                        <input type="text" class="form-control" name="published_at" id="published_at"
+                               required="">
 
-                        <div class="input-group date form_datetime col-md-5" data-date=""
-                             data-date-format="yyyy-mm-dd HH:ii p" data-link-field="openDate">
-                            <input id="published_at" class="form-control" size="16" name="published_at" type="text"
-                                   readonly>
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                        </div>
-                        <input type="hidden" id="timeOfPublication" value=""/>
                     </div>
                     <div id="published_at_warning" data-id="error">
                     </div>

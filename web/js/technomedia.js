@@ -5,6 +5,10 @@ $(function () {
 });
 
 
+$('.date').datetimepicker({
+    format:'Y-m-d H:i'
+});
+
 $.fn.exists = function () {
     return $(this).length;
 };
