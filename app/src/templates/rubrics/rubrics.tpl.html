@@ -1,0 +1,129 @@
+<?php $partViewer->view('layouts/header'); ?>
+<?php $partViewer->view('menu/up_menu'); ?>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Список рубрик</h1>
+            </div>
+        </div>
+        <div class="row" id="rubric-row" hidden="true">
+
+
+        </div>
+        <div class="row">
+            <form id="search">
+                <div class="panel panel-default">
+
+                    <div class="panel-heading">
+                        <i class="fa fa-search fa-fw"></i>
+                        Поиск по :
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="exampleInputName2">Названию</label>
+                                <input type="text" class="form-control" id="short_name"
+                                       placeholder="Часть названия или слова через запятую">
+                            </div>
+                            <p></p>
+
+                            <div class="form-group">
+                                <label for="exampleInputName2">Описанию</label>
+                                <input type="text" class="form-control" id="description"
+                                       placeholder="Часть описания или слова через запятую">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="exampleInputName2">По дате создания</label>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-xs-6 col-sm-6">
+                                                <input id="of_created_at" class="form-control date" name="of_created_at"
+                                                       placeholder="от:">
+                                            </div>
+                                            <div class="col-xs-6 col-sm-6">
+                                                <input id="to_created_at" class="form-control date" name="to_created_at"
+                                                       placeholder="до:">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputName2">По дате редактирования</label>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-xs-6 col-sm-6">
+                                                <input id="of_modified_at" class="form-control date"
+                                                       name="of_modified_at" placeholder="от:">
+                                            </div>
+                                            <div class="col-xs-6 col-sm-6">
+                                                <input id="to_modified_at" class="form-control date"
+                                                       name="to_modified_at" placeholder="до:">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div id="search_rubrics" class="btn btn-primary" type="submit">
+                            <i class="fa fa-search fa-fw"></i>Поиск
+                        </div>
+                        <button class="btn btn-default" type="reset" style="margin-right: 5px;">Очистить все
+                            поля
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-sitemap fa-fw"></i>
+                    Список рубрик
+                </div>
+                <div class="panel-body">
+                    <table id="rubrics" class="table table-striped" width="100%">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Название</th>
+                            <th>Родитель</th>
+                            <th>Описание</th>
+                            <th>Дата Создания</th>
+                            <th>Дата Редактирования</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>id</th>
+                            <th>Название</th>
+                            <th>Родитель</th>
+                            <th>Описание</th>
+                            <th>Дата Создания</th>
+                            <th>Дата Редактирования</th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <div id="view_tree_rubrics" class="btn btn-primary" type="submit" data-target="#myModal"
+                         data-toggle="modal">
+                        <i class="fa fa-sitemap fa-fw"></i>Показать дерево рубрик
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php $partViewer->view('html-helper/select-rubric'); ?>
+<?php $partViewer->view('html-helper/loader'); ?>
+<?php $partViewer->view('layouts/footer'); ?>

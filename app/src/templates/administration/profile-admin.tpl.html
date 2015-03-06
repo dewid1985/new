@@ -1,0 +1,156 @@
+<?php $partViewer->view('layouts/header'); ?>
+<?php $partViewer->view('menu/up_menu'); ?>
+
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Профиль пользователя</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-user fa-fw"></i>
+                Профиль
+            </div>
+            <form>
+                <div class="panel-body">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-database fa-fw"></i>
+                            Данные пользователя
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Фамилия</label>
+                                <input type="text" class="form-control" id="last_name"
+                                       placeholder="Фамилия" name="last_name"
+                                       required>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Имя</label>
+                                <input type="text" class="form-control" id="first_name"
+                                       placeholder="Имя" name="first_name"
+                                       required>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Отчество</label>
+                                <input type="text" class="form-control" id="middle_name"
+                                       placeholder="Отчество" name="middle_name"
+                                       required>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Телефон</label>
+                                <input type="text" class="form-control" id="phone"
+                                       placeholder="+79009009999" name="phone"
+                                       required>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Электронная почта</label>
+                                <input type="text" class="form-control" id="email"
+                                       placeholder="example@example.net" name="email"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="glyphicon glyphicon-log-in "></i>
+                            Данные авторизации
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Логин</label>
+                                <input type="text" class="form-control" id="last_name"
+                                       placeholder="Фамилия" name="login"
+                                       required>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Пароль</label>
+                                <input type="text" class="form-control" id="password"
+                                       placeholder="Имя" name="password"
+                                       required>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Повтор пароля</label>
+                                <input type="text" class="form-control" id="re_password"
+                                       placeholder="Отчество" name="re_password"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div id="noun_save" type="submit" class="btn btn-primary" type="button">
+                                <i class="fa fa-check fa-fw"></i>
+                                Проверить
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <img src="<?php echo Project::getBaseUrl() ?>images/jabber-16-000000.png">
+                            XMPP профиль
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Электронная почта</label>
+                                <input type="text" class="form-control" id="xmpp_account"
+                                       placeholder="example" name="xmpp_account"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="glyphicon glyphicon-wrench"></i>
+                            Настройки
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label>Разрешить пользователю редактировать профиль: </label>
+                                <label class="radio-inline">
+                                    <input id="optionsRadiosInline1" type="radio" checked="" value="option1" name="optionsRadiosInline">
+                                    Да
+                                </label>
+                                <label class="radio-inline">
+                                    <input id="optionsRadiosInline2" type="radio" value="option2" name="optionsRadiosInline">
+                                    Нет
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Мультипроектный пользователь: </label>
+                                <label class="radio-inline">
+                                    <input id="optionsRadiosInline1" type="radio" checked="" value="option1" name="optionsRadiosInline">
+                                    Да
+                                </label>
+                                <label class="radio-inline">
+                                    <input id="optionsRadiosInline2" type="radio" value="option2" name="optionsRadiosInline">
+                                    Нет
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Принадлежность пользователя к проекту: </label>
+                                <select class="inline">
+                                    <option>Правда</option>
+                                    <option>Политонлайн</option>
+                                    <option>еки</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div id="noun_save" type="submit" class="btn btn-primary" type="button">
+                        <i class="fa fa-save fa-fw"></i>
+                        Сохранить
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php $partViewer->view('html-helper/loader'); ?>
+<?php $partViewer->view('layouts/footer'); ?>

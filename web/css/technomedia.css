@@ -8,18 +8,19 @@
     left: 50%;
 }
 
-#edit{
+#edit {
     margin-top: -3px;
     margin-right: 3px;
 }
 
-#add{
+#add {
     margin-top: -3px;
 }
 
 .tree {
     padding-left: 0;
 }
+
 .tree,
 .tree ul {
     list-style: none;
@@ -28,6 +29,7 @@
 .tree li {
     position: relative;
 }
+
 .tree li a {
     display: block;
     padding-top: 5px;
@@ -60,6 +62,24 @@ li.active > a > span.fa-folder-o:before {
     content: "\f115" !important;
 }
 
-.selected-tree {
-    background-color: #b0bed9;
+.tree .selected-tree {
+    color: #fff;
+    text-decoration: none;
+    background-color: #428bca;
+    /*background-color: #a6d9aa;*/
+}
+
+.scroll-box {
+    overflow-y: scroll;
+    height: 380px;
+    border-radius: 4px;
+    padding-left: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.selected-rubric {
+    color: #00aa00;
+    margin-right: 10px;
 }

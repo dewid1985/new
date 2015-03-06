@@ -6,7 +6,7 @@ $(function () {
 
 
 $('.date').datetimepicker({
-    format:'Y-m-d H:i'
+    format: 'Y-m-d H:i'
 });
 
 $.fn.exists = function () {
@@ -54,53 +54,6 @@ $('.form_datetime').datetimepicker({
 var getBaseUrl = function () {
     return 'http://' + location.host + '/';
 };
-
-$('#relatedToArticle').bind('click', function () {
-    var selectedRubric = $("#rubricName option:selected");
-    var selectedDivRubric = $("#rubric");
-    var countRubricDiv = document.getElementById('rubric').children.length;
-    if (countRubricDiv > 6) {
-        return alert('Превышенно кол-во рубрик для статьи');
-    }
-    if (undefined === $("#" + selectedRubric.attr('data-id')).attr('id')) {
-        selectedDivRubric.append('<button type="button" style="margin-right: 3px" '
-        + 'class="btn btn-default btn-xs" onclick="deleteArticleRubric('
-        + selectedRubric.attr('data-id') +
-        ')" id="'
-        + selectedRubric.attr('data-id') +
-        '">' + $.trim(selectedRubric.text()) + ' &times;</button>');
-        selectedDivRubric.append('<input id="rubric_'
-        + selectedRubric.attr("data-id") +
-        '" hidden value="'
-        + selectedRubric.attr("data-id") +
-        '" name="rubric_' + getId(countRubricDiv) + '"/>');
-    } else {
-        return alert('Статья уже привязанна к данной рубрике');
-    }
-});
-
-var getId = function (countRubricDiv) {
-    if ($('form :input[name="rubric_1"]').length == 0)
-        return 1;
-    countRubricDiv = countRubricDiv / 2;
-    if ($('form :input[name="rubric_' + Math.ceil(countRubricDiv) + '"]').length == 0)
-        return countRubricDiv;
-    return getId(countRubricDiv + 2);
-};
-
-//var deleteArticleRubric = function (idRubric) {
-//    $("#" + idRubric.id).remove();
-//    $("#rubric_" + idRubric.id).remove();
-//};
-
-//$('#get_rubrics').click(function () {
-//    $('option', $("#rubricName")).remove();
-//    $.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
-//        $.each(json.data, function (id, name) {
-//            $('#rubricName').append('<option data-id="' + id + '">' + name + '</option>');
-//        });
-//    });
-//});
 
 
 /**articles**/
@@ -186,7 +139,10 @@ var Articles = {
                 Articles.setMessageTpl($().technomedia.totalError)
             },
             beforeSend: function () {
-                $('#loading').modal('show');
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
             },
             complete: function () {
                 $('#loading').modal('hide');
@@ -216,7 +172,10 @@ var Articles = {
                 Articles.setMessageTpl($().technomedia.totalError)
             },
             beforeSend: function () {
-                $('#loading').modal('show');
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
             },
             complete: function () {
                 $('#loading').modal('hide');
@@ -323,7 +282,7 @@ var Articles = {
         $.each(rubrics, function (k, v) {
             selectedDivRubric.append(
                 '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
-                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name+'" name="' + k + '" value="' + v.name + '">'
+                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name + '" name="' + k + '" value="' + v.name + '">'
             );
         });
     }
@@ -411,7 +370,10 @@ var News = {
                 News.setMessageTpl($().technomedia.totalError)
             },
             beforeSend: function () {
-                $('#loading').modal('show');
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
             },
             complete: function () {
                 localStorage.removeItem('newsId');
@@ -442,7 +404,10 @@ var News = {
                 News.setMessageTpl($().technomedia.totalError)
             },
             beforeSend: function () {
-                $('#loading').modal('show');
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
             },
             complete: function () {
                 $('#loading').modal('hide');
@@ -549,7 +514,7 @@ var News = {
         $.each(rubrics, function (k, v) {
             selectedDivRubric.append(
                 '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
-                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name+'" name="' + k + '" value="' + v.name + '">'
+                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name + '" name="' + k + '" value="' + v.name + '">'
             );
         });
     }
@@ -557,6 +522,7 @@ var News = {
 
 /**********************************************************************************************************************/
 var Rubric = {
+    url: getBaseUrl() + 'rubrics/',
     table: $('#rubrics').dataTable(
         {
             "language": {
@@ -571,6 +537,12 @@ var Rubric = {
                 "data": function (requestDataModifiedGET) {
                     delete requestDataModifiedGET.columns;
                     delete requestDataModifiedGET.order;
+                    requestDataModifiedGET.short_name = $('#short_name').val();
+                    requestDataModifiedGET.description = $('#description').val();
+                    requestDataModifiedGET.of_created_at = $('#of_created_at').val();
+                    requestDataModifiedGET.to_created_at = $('#to_created_at').val();
+                    requestDataModifiedGET.of_modified_at = $('#of_modified_at').val();
+                    requestDataModifiedGET.to_modified_at = $('#to_modified_at').val();
                 }
             },
             "columns": [
@@ -641,10 +613,43 @@ var Rubric = {
         });
 
         $('#rubrics tbody').on('click', 'button', function () {
-            RubricId = Rubric.table.api().row($(this).parents('tr')).data().id;
-            $.getJSON(getBaseUrl() + 'rubrics/get/' + RubricId, function (json) {
-                if (json.success == false)
-                    return Rubric.setMessageTpl($().technomedia.totalRubricError);
+            localStorage.setItem('rubricId', Rubric.table.api().row($(this).parents('tr')).data().id);
+            $(location).attr('href', Rubric.url + 'editor');
+
+        });
+
+        if (!!localStorage.getItem('rubricId'))
+            this.get();
+
+        $('#search_rubrics').click(function () {
+            Rubric.reloadTable();
+        });
+    },
+    reloadTable: function () {
+        this.table.api().ajax.reload();
+    },
+    get: function () {
+        var rubricId = localStorage.getItem('rubricId');
+        localStorage.removeItem('rubricId');
+
+        $.ajax({
+            type: "post",
+            url: Rubric.url + 'get/' + rubricId,
+            error: function () {
+                News.setMessageTpl($().technomedia.totalError)
+            },
+            beforeSend: function () {
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
+            },
+            complete: function () {
+                localStorage.removeItem('newsId');
+                $('#loading').modal('hide');
+            },
+            success: function (json) {
+                json = $.parseJSON(json);
                 $.each(json.data, function (field, value) {
                     if (field === 'parent') {
                         $('.tree a').each(function () {
@@ -655,11 +660,7 @@ var Rubric = {
                         $('#' + field).val(value);
                     }
                 });
-            });
-
-            $('#rubric-row').animate({height: 'show'}, 500);
-            $('body,html').animate({scrollTop: 0}, 500);
-
+            }
         });
     },
     insertRubricTpl: function (ulId, data) {
@@ -702,10 +703,12 @@ var Rubric = {
                 Rubric.setMessageTpl($().technomedia.totalError)
             },
             beforeSend: function () {
-                $('#loading').modal('show');
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
             },
             complete: function () {
-                Rubric.table.api().ajax.reload();
                 $('#loading').modal('hide');
             },
             success: function (data) {
@@ -714,19 +717,20 @@ var Rubric = {
                     if (false === data.success) {
                         Rubric.setErrorForm(data.errors);
                     } else {
-                        Rubric.setMessageTpl($().technomedia.saveRubricOk);
+                        Rubric.addRubricMessageOk();
                         Rubric.clear();
                     }
                 } catch (e) {
                     Rubric.setMessageTpl($().technomedia.totalError);
                     Rubric.clear();
                 }
-                $('body,html').animate({scrollTop: 0}, 500);
             }
         });
-        $('#addRubric, #add').attr('disabled', false);
     },
     clear: function () {
+        $('.tree a[class=selected-tree]').each(function () {
+            $(this).removeClass('selected-tree')
+        });
         $('#rubric')[0].reset();
     },
     setErrorForm: function (error) {
@@ -760,6 +764,31 @@ var Rubric = {
                     onClick: function (noty) {
                         Rubric.setRubric();
                         noty.close();
+                    }
+                }
+            ]
+        });
+    },
+    addRubricMessageOk: function () {
+        noty({
+            text: $().technomedia.addRubricMessageOk,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-primary',
+                    text: $().technomedia.addRubricMessageOkBtnList,
+                    onClick: function () {
+                        $(location).attr("href", Rubric.url);
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.addRubricMessageOkBtnNew,
+                    onClick: function () {
+                        $(location).attr("href", Rubric.url + 'editor');
                     }
                 }
             ]
@@ -800,10 +829,15 @@ var Rubric = {
             complete: function () {
                 $('#rubric .btn-default').each(function () {
                     $('#selected-rubric a[data-id =' + $(this).attr('data-id') + ']').addClass('selected-tree');
-                })
+
+                    $('#sel').append('<p id="selected_' + $(this).attr('data-id') + '">' +
+                    '<i class="fa fa-check selected-rubric"></i>' +
+                    $(this).text().replace('×', '') +
+                    '</p>');
+                });
             },
             success: function (data) {
-                var json  = $.parseJSON(data);
+                var json = $.parseJSON(data);
                 $(json.data.rubrics).each(function (k, v) {
                     var defaultIcon = ' <span class="fa fa-sitemap fa-fw"></span>';
                     if ($(v.data).length > 0) {
@@ -822,30 +856,15 @@ var Rubric = {
             }
 
         });
-
-        //$.getJSON(getBaseUrl() + 'rubrics/get', function (json) {
-        //    $(json.data.rubrics).each(function (k, v) {
-        //        var defaultIcon = ' <span class="fa fa-sitemap fa-fw"></span>';
-        //        if ($(v.data).length > 0) {
-        //            defaultIcon = '<span class="fa fa-folder-o"></span>';
-        //        }
-        //        $('.tree').append(
-        //            '<li>' +
-        //            '<a data-id=' + v.dataId + ' >' +
-        //            defaultIcon + v.value + '</a>' +
-        //            '<ul id="' + v.dataId + '">'
-        //        );
-        //        if ($(v.data).length > 0) {
-        //            Rubric.insertRubricTpl(v.dataId, v.data);
-        //        }
-        //    });
-        //});
     }
 };
 
 var SelectedRubric = {
     init: function () {
         $('#get_rubrics').click(function () {
+            $('#sel p').each(function () {
+                $(this).remove()
+            });
             Rubric.setRubric();
         });
 
@@ -853,12 +872,17 @@ var SelectedRubric = {
             $.noty.closeAll();
             if ($(this).hasClass('selected-tree')) {
                 $(this).removeClass('selected-tree');
+                $('#selected_' + $(this).attr('data-id')).remove()
             }
             else {
                 if ($('#selected-rubric a[class=selected-tree]').length == 3) {
                     return SelectedRubric.message($().technomedia.selectedRubricErrorMax);
                 }
                 $(this).addClass('selected-tree');
+                $('#sel').append('<p id="selected_' + $(this).attr('data-id') + '">' +
+                '<i class="fa fa-check selected-rubric"></i>' +
+                $(this).text() +
+                '</p>');
             }
         });
 
@@ -869,6 +893,17 @@ var SelectedRubric = {
             $(this).remove();
         });
 
+        $('#view_tree_rubrics').click(
+            function () {
+                $('#myModal .col-md-5').remove();
+                $('#myModal .col-md-7').removeClass('col-md-7').addClass('col-md-12');
+                $('#myModal .modal-footer').remove();
+                $('#selected-rubric-message').remove();
+                $('#myModalLabel').text($().technomedia.treeRubricsName);
+                Rubric.setRubric();
+
+            }
+        );
         $('#relatedTo').click(function () {
             SelectedRubric.relatedTo();
         })
@@ -895,9 +930,16 @@ var SelectedRubric = {
 
         $('#rubric .btn-default').each(function () {
             $(this).remove();
+            $('#selected-rubric a[class=selected-tree]').each(function () {
+                if ($('[data-id=' + $(this).attr('data-id') + ']').length = 0) {
+                    $('[data-id=' + $(this).attr('data-id') + ']').remove();
+                }
+            });
+
         });
 
         $('#selected-rubric a[class=selected-tree]').each(function () {
+            console.log(this);
 
             if ($('#rubric button[data-id=' + $(this).attr('data-id') + ']').length == 1)
                 return;
@@ -913,8 +955,9 @@ var SelectedRubric = {
             + $(this).attr('data-id') +
             '" name="rubric_' + i + '"/>');
             i++;
-        })
+        });
 
+        $('#myModal').modal('hide');
     }
 };
 

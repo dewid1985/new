@@ -219,6 +219,16 @@ RouterRewrite::me()
             )
     )
     ->addRoute(
+        'editor rubrics',
+        RouterTransparentRule::create('/rubrics/editor')
+            ->setDefaults(
+                [
+                    'area' => 'Rubrics',
+                    'action' => 'editor',
+                ]
+            )
+    )
+    ->addRoute(
         'add rubrics',
         RouterTransparentRule::create('/rubrics/add/:responseType')
             ->setDefaults(
@@ -264,6 +274,26 @@ RouterRewrite::me()
                     'area' => 'Rubrics',
                     'action' => 'getById',
                     'responseType' => 'json'
+                ]
+            )
+    )
+    ->addRoute(
+        'Add admin Users',
+        RouterTransparentRule::create('/admins/add/')
+            ->setDefaults(
+                [
+                    'area' => 'ManagingAdmins',
+                    'action' => 'add'
+                ]
+            )
+    )
+    ->addRoute(
+        'get system projects',
+        RouterTransparentRule::create('/admins/project/getlist')
+            ->setDefaults(
+                [
+                    'area' => 'Project',
+                    'action' => 'getProjectList'
                 ]
             )
     )

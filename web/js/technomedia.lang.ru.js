@@ -21,5 +21,9 @@ $.fn.technomedia = {
     addNewsMessageOkBtnList:['Список новостей'],
     addNewsMessageOkBtnNew:['Новая `Новость`'],
     selectedRubricErrorMax:['Превышенно количество рубрик! Материал можно максимально привязать к трем рубрикам'],
-    noSelectedRubricError:['Вы не выбрали рубрики!']
+    noSelectedRubricError:['Вы не выбрали рубрики!'],
+    treeRubricsName:['Дерево рубрик'],
+    addRubricMessageOkBtnList:['Список рубрик'],
+    addRubricMessageOkBtnNew:['Новая `Рубрика`'],
+    addRubricMessageOk:['Рубрика успешно сохраненна']
 };

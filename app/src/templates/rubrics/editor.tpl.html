@@ -1,0 +1,79 @@
+<?php $partViewer->view('layouts/header'); ?>
+<?php $partViewer->view('menu/up_menu'); ?>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Рубрика</h1>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-sitemap fa-fw"></i>
+                Рубрика
+            </div>
+            <form id="rubric">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Название</label>
+                        <input type="text" class="form-control" id="short_name"
+                               placeholder="Название рубрики. Пример `Экономический кризис`" name="short_name"
+                               required>
+                        <input id="rubric_id" hidden="" type="text" name="rubric_id">
+                    </div>
+                    <div id="short_name_warning" data-id="error">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group">Описание</label>
+                            <textarea
+                                id="description"
+                                class="form-control" rows="3"
+                                placeholder=
+                                "Описание. Пример `Экономический кризис характеризуется падениемпроизводства, происходящим в значительных масштабах.`"
+                                name="description" required></textarea>
+                    </div>
+                    <div id="description_warning" data-id="error">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group">Ключевая фраза</label>
+                            <textarea id="meta_description" class="form-control" rows="3"
+                                      placeholder
+                                      ="Ключевая фраза. Пример `Кризис в рыночной экономике происходит в результате конъюнктуры на денежном рынке, создаваемой центральными банками и системой не со 100 % нормой резервирования, что приводит к заниженным процентным ставкам, росту денежной массы`"
+                                      name="meta_description" required></textarea>
+                    </div>
+                    <div id="meta_description_warning" data-id="error">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group">Ключевые слова</label>
+                            <textarea id="meta_keywords" class="form-control" rows="3" name="meta_keywords"
+                                      placeholder="Ключевые слова. Пример `Кризис, Экномический кризис ...`" required
+                                ></textarea>
+                    </div>
+                    <div id="meta_keywords_warning" data-id="error">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Родительская рубрика</label>
+
+                        <div class="scroll-box">
+                            <nav class="nav">
+                                <ul id="tree" class="tree">
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div id="parent_warning" data-id="error">
+                    </div>
+                    <div id="error" data-id="error">
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <!--                        <div id="turn" class="btn btn-default">Скрыть</div>-->
+                    <div id="addRubric" type="button" class="btn btn-primary">
+                        <i class="fa fa-save fa-fw"></i>
+                        Сохранить
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+<?php $partViewer->view('html-helper/loader'); ?>
+<?php $partViewer->view('layouts/footer'); ?>

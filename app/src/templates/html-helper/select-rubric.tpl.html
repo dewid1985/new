@@ -1,5 +1,4 @@
-<!-- Рубрики -->
-<div class="modal fade bs-example-modal-sm"
+<div class="modal fade"
      id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true">
     <div class="modal-dialog">
@@ -9,19 +8,40 @@
                         aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">Выбор рубрики</h4>
             </div>
+            <div id="selected-rubric-message">
+            </div>
             <div class="modal-body">
-                <div id="selected-rubric-message">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="scroll-box">
+                            <nav class="nav">
+                                <ul id="selected-rubric" class="tree">
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Дополнительно
+                            </div>
+                            <div class="panel-body">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#sel" data-toggle="tab">Выбранные рубрики</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane fade in active" id="sel">
+                                        <br/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <nav class="nav">
-                    <ul id="selected-rubric" class="tree">
-                    </ul>
-                </nav>
-
-<!--                <select multiple class="form-control" id="rubricName">-->
-<!--                </select>-->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Завершить</button>
                 <button type="button" class="btn btn-primary" id="relatedTo">Привязать</button>
             </div>
         </div>

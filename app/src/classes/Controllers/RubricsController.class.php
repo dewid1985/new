@@ -70,8 +70,15 @@ class RubricsController extends ProjectAuthMappedController
     {
         return $this
             ->getModelAndView(
-                ProjectResponseView::create()->setTpl('rubrics/index')
+                ProjectResponseView::create()->setTpl('rubrics/rubrics')
             );
+    }
+
+    public function editorAction(HttpRequest $request)
+    {
+        return ModelAndView::create()
+            ->setModel(Model::create())
+            ->setView('rubrics/editor');
     }
 
 
@@ -184,12 +191,11 @@ class RubricsController extends ProjectAuthMappedController
 
         try {
             $this->getModule()->init(RubricsOperationEnum::save());
-        }catch (OperationSaveRubricException $e)
-        {
+        } catch (OperationSaveRubricException $e) {
             return $this->getModelAndView(
                 $responseView
                     ->setSuccess(FALSE)
-                    ->setError('failureSave',PlatformRubricErrorEnum::failure()->getName())
+                    ->setError('failureSave', PlatformRubricErrorEnum::failure()->getName())
             );
         }
         return $this->getModelAndView($responseView->setSuccess(TRUE));
@@ -218,15 +224,7 @@ class RubricsController extends ProjectAuthMappedController
         /** @var ModuleRubricsGetAllListOperationResponse $response */
         $response = $this->getModule()->getModuleObject()->getResponse();
 
-        $responseView->setData('rubrics',$response->getData());
-//        foreach ($response->getData() as $key => $rubric) {
-//            if ($key == 0) continue;
-//            /** @var PlatformCommonRubric $rubric */
-//            $responseView->setData(
-//                $rubric->getName(),
-//                $this->replacedBySpace($rubric->getPath()) . $rubric->getRubricData()->getShortName()
-//            );
-//        };
+        $responseView->setData('rubrics', $response->getData());
 
         return $this->getModelAndView(
             $responseView
@@ -241,13 +239,20 @@ class RubricsController extends ProjectAuthMappedController
      */
     public function getRubricsListAction(HttpRequest $request)
     {
+
         $this->setForm($this->getValidatedSearchForm()->import($request->getGet()));
 
         $this->getModule()->getModuleObject()->setRequest(
             ModuleRubricsSearchOperationRequest::create()
+                ->setToCreatedAt($this->getForm()->get('to_created_at')->getValue())
+                ->setOfCreatedAt($this->getForm()->get('of_created_at')->getValue())
+                ->setToModifiedAt($this->getForm()->get('to_modified_at')->getValue())
+                ->setOfModifiedAt($this->getForm()->getValue('of_modified_at'))
                 ->setDraw($this->getForm()->get('draw')->getValue())
                 ->setOffset($this->getForm()->get('start')->getValue())
                 ->setLimit($this->getForm()->get('length')->getValue())
+                ->setShortName($this->getForm()->get('short_name')->getValue())
+                ->setDescription($this->getForm()->getValue('description'))
         );
 
         $this->getModule()->init(RubricsOperationEnum::search());
@@ -263,7 +268,6 @@ class RubricsController extends ProjectAuthMappedController
                     ->set('data', $response->getData())
             )
             ->setView(JsonView::create());
-
     }
 
     public function getByIdAction(HttpRequest $request)
@@ -323,31 +327,14 @@ class RubricsController extends ProjectAuthMappedController
         return Form::create()
             ->add(Primitive::integer('draw')->required())
             ->add(Primitive::integer('start')->required())
-            ->add(Primitive::integer('length')->required());
-    }
+            ->add(Primitive::integer('length')->required())
+            ->add(Primitive::timestampTZ('to_created_at'))
+            ->add(Primitive::timestampTZ('of_created_at'))
+            ->add(Primitive::timestampTZ('to_modified_at'))
+            ->add(Primitive::timestampTZ('of_modified_at'))
+            ->add(Primitive::string('short_name'))
+            ->add(Primitive::string('description'));
 
-    /**
-     * @param $path
-     * @return string
-     */
-    protected function replacedBySpace($path)
-    {
-        return implode('', array_pad(array(), count(explode('.', $path)), '&nbsp&nbsp'));
-//
-//        $str = null;
-//        $this->setRubrics($path);
-//
-//        if (count($this->getRubrics()) == 1) {
-//            return '|--';
-//        }
-//
-//        for ($i = 1; $i <= count(explode(".", $path)); $i++)
-//            if ($i > count(explode(".", $path)) - 1)
-//                $str .= "---";
-//            else
-//                $str .= "|&nbsp&nbsp";
-//
-//        return $str;
     }
 
 
@@ -363,6 +350,7 @@ class RubricsController extends ProjectAuthMappedController
     {
         return [
             'index' => 'indexAction',
+            'editor' => 'editorAction',
             'getRubrics' => 'getRubricsAction',
             'add' => 'addAction',
             'getRubricsList' => 'getRubricsListAction',
