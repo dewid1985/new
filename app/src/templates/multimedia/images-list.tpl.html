@@ -1,0 +1,103 @@
+<?php $partViewer->view('layouts/header'); ?>
+<?php $partViewer->view('menu/up_menu'); ?>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Список изображений</h1>
+            </div>
+        </div>
+        <div class="row">
+            <form id="search-images">
+                <div class="panel panel-default">
+
+                    <div class="panel-heading">
+                        <i class="fa fa-search fa-fw"></i>
+                        Поиск по :
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="exampleInputName2">Названию</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                       placeholder="Часть названия или слова через запятую">
+                            </div>
+                            <p></p>
+
+                            <div class="form-group">
+                                <label for="exampleInputName2">Описанию</label>
+                                <input type="text" class="form-control" id="description" name="description"
+                                       placeholder="Часть описания или слова через запятую">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="exampleInputName2">Тегам</label>
+                                <input type="text" class="form-control" id="tags" name="tags"
+                                       placeholder="Часть тегов или теги через запятую">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputName2">По дате создания</label>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-xs-6 col-sm-6">
+                                                <input id="of_uploaded_at" class="form-control date" name="of_uploaded_at"
+                                                       placeholder="от:">
+                                            </div>
+                                            <div class="col-xs-6 col-sm-6">
+                                                <input id="to_uploaded_at" class="form-control date" name="to_uploaded_at"
+                                                       placeholder="до:">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div id="search_image" class="btn btn-primary" type="submit">
+                            <i class="fa fa-search fa-fw"></i>Поиск
+                        </div>
+                        <button class="btn btn-default" type="reset" style="margin-right: 5px;">Очистить все
+                            поля
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="glyphicon glyphicon-picture"></i>
+                    Изображения
+                </div>
+                <div class="panel-body">
+                    <table id="images" class="table table-striped" width="100%">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Название</th>
+                            <th>Описание</th>
+                            <th>Иконка</th>
+                            <th>Дата загрузки</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>id</th>
+                            <th>Название</th>
+                            <th>Описание</th>
+                            <th>Иконка</th>
+                            <th>Дата загрузки</th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<?php $partViewer->view('html-helper/loader'); ?>
+<?php $partViewer->view('layouts/footer'); ?>

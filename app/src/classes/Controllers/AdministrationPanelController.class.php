@@ -14,7 +14,6 @@ class AdministrationPanelController extends ProjectAuthMappedController
      */
     public function indexAction(HttpRequest $request)
     {
-
         return ModelAndView::create()
                     ->setModel(Model::create())
                     ->setView('index');
@@ -31,7 +30,7 @@ class AdministrationPanelController extends ProjectAuthMappedController
     protected function /* array */
     getMapping()
     {
-        return array(
+        return ARRAY(
             'index' => 'indexAction'
         );
     }

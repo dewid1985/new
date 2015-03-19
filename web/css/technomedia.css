@@ -83,3 +83,14 @@ li.active > a > span.fa-folder-o:before {
     color: #00aa00;
     margin-right: 10px;
 }
+
+.scroll-box-image {
+    overflow: scroll;
+    height:600px;
+    width: 800px;
+    border-radius: 4px;
+    padding-left: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border: 1px solid #ddd;
+}

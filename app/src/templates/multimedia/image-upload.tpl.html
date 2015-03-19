@@ -1,0 +1,76 @@
+<?php $partViewer->view('layouts/header'); ?>
+<?php $partViewer->view('menu/up_menu'); ?>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Загрузить фото</h1>
+            </div>
+        </div>
+        <div id="row">
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <i class="fa fa-photo fa-fw"></i>
+                    Сохранение изображения
+                </div>
+                <div class="panel-body">
+                    <form id="image-upload" enctype="multipart/form-data">
+                        <div class="col-md-2">
+                            <img id="image_ico" class="img-thumbnail" alt="140x140" data-src="holder.js/140x140"
+                                 style="width: auto; height: auto;"
+                                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgdmlld0JveD0iMCAwIDE0MCAxNDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxkZWZzLz48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjQ1IiB5PSI3MCIgc3R5bGU9ImZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0O2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9nPjwvc3ZnPg=="
+                                 data-holder-rendered="true">
+                        </div>
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Название фото</label>
+                                <input type="text" class="form-control" id="name"
+                                       placeholder="Название фото. Пример `Салют`" name="name"
+                                       required>
+                            </div>
+                            <div id="name_warning" data-id="error">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-group">Описание</label>
+                            <textarea
+                                id="description"
+                                class="form-control" rows="2"
+                                placeholder=
+                                "Описание. Пример `Салют на 9 мая`"
+                                name="description" required></textarea>
+                            </div>
+                            <div id="description_warning" data-id="error">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-group">Теги</label>
+                            <textarea id="tags" class="form-control" rows="2"
+                                      placeholder
+                                      ="Теги. Пример `Салют, Салют на 9 мая 1995`"
+                                      name="tags" required></textarea>
+
+                            </div>
+                            <div id="tags_warning" data-id="error">
+                            </div>
+                            <div class="form-group" style="margin-top: 5px;">
+                                <label class="form-group">Файл</label>
+                                <input type="file" name="image" id="image"><br>
+                            </div>
+                            <div id="image_warning" data-id="error">
+                            </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div id="photo_save" class="btn btn-primary" type="submit">
+                    <i class="fa fa-save fa-fw"></i>
+                    Сохранить
+                </div>
+                <div id="new_photo" class="btn btn-primary" type="submit">
+                    <i class="glyphicon glyphicon-picture"></i> Загрузить еще
+                </div>
+            </div>
+        </div>
+    </div>
+
+<?php $partViewer->view('html-helper/loader'); ?>
+<?php $partViewer->view('layouts/footer'); ?>

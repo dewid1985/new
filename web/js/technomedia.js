@@ -917,9 +917,7 @@ var SelectedRubric = {
             theme: 'defaultTheme',
             maxVisible: 30
         });
-    }
-
-    ,
+    },
     relatedTo: function () {
 
         if ($('#selected-rubric a[class=selected-tree]').length == 0) {
@@ -939,8 +937,6 @@ var SelectedRubric = {
         });
 
         $('#selected-rubric a[class=selected-tree]').each(function () {
-            console.log(this);
-
             if ($('#rubric button[data-id=' + $(this).attr('data-id') + ']').length == 1)
                 return;
 
@@ -961,8 +957,162 @@ var SelectedRubric = {
     }
 };
 
+var ImageWriter = {
+    jcropApi: null,
+    table: $('#images')
+        .on('xhr.dt', function (e, settings, json) {
+            for (var i = 0, ien = json.data.length; i < ien; i++) {
+                json.data[i].ico_file = '<img id="image_search" class="img-thumbnail"' +
+                ' data-holder-rendered="true" src="' + getBaseUrl() + 'images/upload/' + json.data[i].ico_file +
+                '" style=" display: block;max-width: 30%; max-height: 30%;" alt="140x140">';
+            }
+            // Тут возомжно придется менять адресса изображений а именно путь до них тут нужно
+            // будет думать
+        }).
+        on('draw.dt', function () {
+            $('.img-thumbnail').each(function () {
+                $(this).hover(
+                    function () {
+                        $(this).stop().animate({"max-width": "100%", display: "block", "max-height": "100%"}, 2);
+                    },
+                    function () {
+                        $(this).stop().animate({"max-width": "30%", display: "block", "max-height": "30%"}, 2);
+                    }
+                )
+            })
+        }).
+        dataTable(
+        {
+            "language": {
+                "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"
+            },
+            "bFilter": false,
+            "processing": true,
+            "serverSide": true,
+            "bSort": false,
+            "ajax": {
+                "url": "list",
+                "data": function (requestDataModifiedGET) {
+                    delete requestDataModifiedGET.columns;
+                    delete requestDataModifiedGET.order;
+                    requestDataModifiedGET.title = $('#title').val();
+                    requestDataModifiedGET.description = $('#description').val();
+                    requestDataModifiedGET.tags = $('#tags').val();
+                    requestDataModifiedGET.of_uploaded_at = $('#of_uploaded_at').val();
+                    requestDataModifiedGET.to_uploaded_at = $('#to_uploaded_at').val();
+                }
+            },
+            "columns": [
+                {"data": "id"},
+                {"data": "title"},
+                {"data": "description"},
+                {"data": "ico_file"},
+                {"data": "uploaded_at"}
+            ]
+        }
+    ),
+    init: function () {
+        $('#new_photo').hide();
+
+        $('#photo_save').click(function () {
+            $.noty.closeAll();
+            ImageWriter.saveImages();
+        });
+
+        $('input:radio').on('change', function () {
+            ImageWriter.jcrop($(this).val());
+        });
+
+        $('#search_image').click(function(){
+            ImageWriter.reloadTable();
+        });
+
+        $('#new_photo').click(function () {
+            $(location).attr('href', getBaseUrl() + 'multimedia/image');
+        })
+    },
+    reloadTable: function(){
+      this.table.api().ajax.reload();
+
+    },
+    jcrop: function (size) {
+        $('#images-crop').Jcrop({
+            allowResize: false,
+            setSelect: $.parseJSON(size),
+            onSelect: ImageWriter.setParamSelect
+        }, function () {
+            ImageWriter.jcropApi = this;
+        });
+    },
+    setParamSelect: function (c) {
+        $('#x').val(c.x);
+        $('#y').val(c.y);
+        $('#w').val(c.w);
+        $('#h').val(c.h);
+    },
+    saveImages: function () {
+        var fd = new FormData();
+        fd.append('name', $('#name').val());
+        fd.append('description', $('#description').val());
+        fd.append('tags', $('#tags').val());
+        fd.append('image', $('#image')[0].files[0]);
+        $.ajax({
+            type: "post",
+            url: getBaseUrl() + 'multimedia/upload',
+            data: fd,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            beforeSend: function () {
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
+            },
+            complete: function () {
+                $('#loading').modal('hide');
+            },
+            success: function (json) {
+                if (false === json.success) {
+                    Rubric.setErrorForm(json.errors);
+                } else {
+                    $('#image_ico').attr('src', getBaseUrl() + 'images/upload/' + json.data.ico);
+                    $('#photo_save').hide();
+                    $('#new_photo').show();
+                }
+            },
+            error: function (data) {
+
+            }
+        })
+    },
+    setErrorForm: function (error) {
+        $.each(error, function (k, v) {
+
+            if (k === 'failureSave')
+                Rubric.setMessageTpl(v);
+
+            $('#' + k + '_warning').noty({
+                text: '<i class="glyphicon glyphicon-exclamation-sign"></i> ' + v,
+                type: 'warning',
+                dismissQueue: true,
+                layout: 'topCenter',
+                theme: 'defaultTheme',
+                maxVisible: 30
+            });
+        })
+    }
+
+};
+
+
 SelectedRubric.init();
 News.init();
 Articles.init();
 Rubric.init();
+ImageWriter.init();
+
+
+
+
 

@@ -7,7 +7,7 @@
  */
 
 RouterRewrite::me()
-    /** Auth */
+    /********************************Authorization******************************************/
     ->addRoute(
         'in Admin',
         RouterTransparentRule::create('/')
@@ -58,7 +58,7 @@ RouterRewrite::me()
                 ]
             )
     )
-    /** Articles */
+    /********************************Articles******************************************/
     ->addRoute(
         'articles list',
         RouterTransparentRule::create('/articles/:responseType')
@@ -132,7 +132,7 @@ RouterRewrite::me()
             )
 
     )
-    /** News  */
+    /********************************News******************************************/
     ->addRoute(
         'news list',
         RouterTransparentRule::create('/news/:responseType')
@@ -206,7 +206,7 @@ RouterRewrite::me()
             )
 
     )
-    /** rubrics */
+    /********************************Rubrics******************************************/
     ->addRoute(
         'index rubrics',
         RouterTransparentRule::create('/rubrics/:responseType')
@@ -252,14 +252,14 @@ RouterRewrite::me()
     )
     ->addRoute(
         'get rubrics list json of tree',
-            RouterTransparentRule::create('/rubrics/getlist')
-                ->setDefaults(
-                    [
-                        'area' => 'Rubrics',
-                        'action' => 'getRubricsList',
-                        'responseType' => 'json'
-                    ]
-                )
+        RouterTransparentRule::create('/rubrics/getlist')
+            ->setDefaults(
+                [
+                    'area' => 'Rubrics',
+                    'action' => 'getRubricsList',
+                    'responseType' => 'json'
+                ]
+            )
     )
     ->addRoute(
         'get rubric by id',
@@ -277,6 +277,7 @@ RouterRewrite::me()
                 ]
             )
     )
+    /********************************Admins******************************************/
     ->addRoute(
         'Add admin Users',
         RouterTransparentRule::create('/admins/add/')
@@ -287,6 +288,7 @@ RouterRewrite::me()
                 ]
             )
     )
+    /********************************Project******************************************/
     ->addRoute(
         'get system projects',
         RouterTransparentRule::create('/admins/project/getlist')
@@ -294,6 +296,51 @@ RouterRewrite::me()
                 [
                     'area' => 'Project',
                     'action' => 'getProjectList'
+                ]
+            )
+    )
+    /********************************Multimedia******************************************/
+    ->addRoute(
+        'editor image',
+        RouterTransparentRule::create('/multimedia/image')
+            ->setDefaults(
+                [
+                    'area' => 'Multimedia',
+                    'action' => 'image'
+                ]
+            )
+    )
+
+    ->addRoute(
+        'upload image',
+        RouterTransparentRule::create('/multimedia/upload')
+            ->setDefaults(
+                [
+                    'area' => 'Multimedia',
+                    'action' => 'upload',
+                    'responseType' => 'json'
+                ]
+            )
+    )
+    ->addRoute(
+        'get images list view',
+        RouterTransparentRule::create('/multimedia/images/')
+            ->setDefaults(
+                [
+                    'area' => 'Multimedia',
+                    'action' => 'images',
+                    'responseType' => 'json'
+                ]
+            )
+    )
+    ->addRoute(
+        'get list images',
+        RouterTransparentRule::create('/multimedia/images/list')
+            ->setDefaults(
+                [
+                    'area' => 'Multimedia',
+                    'action' => 'imagesList',
+                    'responseType' => 'json'
                 ]
             )
     )
