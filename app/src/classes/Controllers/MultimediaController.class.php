@@ -71,6 +71,7 @@ class MultimediaController extends ProjectAuthMappedController
             $moduleRequest->setName($this->transliterate($this->getForm()->get('name')->getValue()));
             $moduleRequest->setTitle($this->getForm()->get('name')->getValue());
         }
+        var_dump('fdfsdfs');
 
         if ($this->getForm()->getError('description'))
             $responseView->setError('description', $this->getForm()->getTextualErrorFor('description'));
