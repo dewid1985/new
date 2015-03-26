@@ -46,7 +46,7 @@ Logger::me()
             ->setFacility(':AdminPanel')
     );
 
-//try {
+try {
     Session::start();
 
     Platform::create()->init();
@@ -86,6 +86,6 @@ Logger::me()
         ->add(WebAppViewHandler::create());
 
     $application->run();
-//} catch (Exception $e) {
-//    Logger::me()->exception($e);
-//}
+} catch (Exception $e) {
+    Logger::me()->exception($e);
+}
