@@ -310,7 +310,6 @@ RouterRewrite::me()
                 ]
             )
     )
-
     ->addRoute(
         'upload image',
         RouterTransparentRule::create('/multimedia/upload')
@@ -341,6 +340,53 @@ RouterRewrite::me()
                     'area' => 'Multimedia',
                     'action' => 'imagesList',
                     'responseType' => 'json'
+                ]
+            )
+    )
+    ->addRoute(
+        'crop images',
+        RouterTransparentRule::create('/multimedia/images/crop/:imageId/:sizeId')
+            ->setRequirements(
+                [
+                    'imageId' => '\d+',
+                    'sizeId' => '\d+'
+                ]
+            )
+            ->setDefaults(
+                [
+                    'area' => 'Multimedia',
+                    'action' => 'crop',
+                    'responseType' => null,
+                    'imageId' => null,
+                    'sizeId' => null
+                ]
+            )
+    )
+    ->addRoute(
+        'crop image and resize',
+        RouterTransparentRule::create('/multimedia/images/crop')
+            ->setDefaults(
+                [
+                    'area' => 'Multimedia',
+                    'action' => 'cropImage',
+                    'responseType' => 'json',
+                ]
+            )
+    )
+    ->addRoute(
+        'get list prewiew by images id',
+        RouterTransparentRule::create('/multimedia/images/preview/:imageId')
+            ->setRequirements(
+                [
+                    'imageId' => '\d+'
+                ]
+            )
+            ->setDefaults(
+                [
+                    'area' => 'Multimedia',
+                    'action' => 'getPreview',
+                    'responseType' => 'json',
+                    'imageId' => null
                 ]
             )
     )

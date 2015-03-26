@@ -635,6 +635,7 @@ var Rubric = {
         $.ajax({
             type: "post",
             url: Rubric.url + 'get/' + rubricId,
+            dataType:"json",
             error: function () {
                 News.setMessageTpl($().technomedia.totalError)
             },
@@ -649,7 +650,6 @@ var Rubric = {
                 $('#loading').modal('hide');
             },
             success: function (json) {
-                json = $.parseJSON(json);
                 $.each(json.data, function (field, value) {
                     if (field === 'parent') {
                         $('.tree a').each(function () {
@@ -660,7 +660,8 @@ var Rubric = {
                         $('#' + field).val(value);
                     }
                 });
-            }
+            },
+            timeout: 3000
         });
     },
     insertRubricTpl: function (ulId, data) {
@@ -962,9 +963,14 @@ var ImageWriter = {
     table: $('#images')
         .on('xhr.dt', function (e, settings, json) {
             for (var i = 0, ien = json.data.length; i < ien; i++) {
-                json.data[i].ico_file = '<img id="image_search" class="img-thumbnail"' +
+                json.data[i].ico_file = '<img id="image_search" class="img-thumbnail center-block"' +
                 ' data-holder-rendered="true" src="' + getBaseUrl() + 'images/upload/' + json.data[i].ico_file +
                 '" style=" display: block;max-width: 30%; max-height: 30%;" alt="140x140">';
+
+                if(json.data[i].count_cropped > 0)
+                    json.data[i].count_cropped = '<strong>'+json.data[i].count_cropped + '</strong>&nbsp;<button ' +
+                    'class="btn btn-default btn-circle" id="show_images"' +
+                    ' type="button"> <i class="glyphicon glyphicon-search "></i></button>';
             }
             // Тут возомжно придется менять адресса изображений а именно путь до них тут нужно
             // будет думать
@@ -1007,50 +1013,138 @@ var ImageWriter = {
                 {"data": "title"},
                 {"data": "description"},
                 {"data": "ico_file"},
-                {"data": "uploaded_at"}
+                {"data": "uploaded_at"},
+                {
+                    "data": "count_cropped",
+                    "class": "text-center"
+                },
+                {
+                    "data": null,
+                    "class": "text-center",
+                    "defaultContent": '<div class="dropdown"> ' +
+                    '<button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                    'Действия' +
+                    '<span class="caret"></span> ' +
+                    '</button> ' +
+                    '<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"> ' +
+                    '<li role="presentation" ><a id="crop"><i class="fa fa-cut"></i> Нарезать фото</a></li>' +
+                    '<li role="presentation" ><a id="edit"><i class="fa fa-pencil"></i> Редактировать описание</a></li>' +
+                    '</ul> ' +
+                    '</div>'
+                }
             ]
         }
     ),
     init: function () {
         $('#new_photo').hide();
-
         $('#photo_save').click(function () {
             $.noty.closeAll();
-            ImageWriter.saveImages();
+            ImageWriter.addImages();
         });
 
-        $('input:radio').on('change', function () {
-            ImageWriter.jcrop($(this).val());
-        });
-
-        $('#search_image').click(function(){
+        $('#search_image').click(function () {
             ImageWriter.reloadTable();
         });
-
         $('#new_photo').click(function () {
             $(location).attr('href', getBaseUrl() + 'multimedia/image');
-        })
+        });
+
+        $('#select-size').click(function () {
+            $(location).attr('href', getBaseUrl() + 'multimedia/images/crop/' + $('#imagesId').val() + '/' +
+            $('input:radio[name=imagesSize]:checked').val());
+        });
+
+        $('#images tbody').on('click', '#crop', function () {
+            $(location).attr('href', getBaseUrl() + 'multimedia/images/crop/' +
+            ImageWriter.table.api().row($(this).parents('tr')).data().id);
+        });
+
+        $('#images tbody').on('click', '#show_images',function(){
+            $('#croppedImagesShow').modal('show');
+        });
+
+        $('#crop-image').click(function () {
+            ImageWriter.saveDialog($().technomedia.addCropImagesMessage)
+        });
+        ImageCrop.init();
     },
-    reloadTable: function(){
-      this.table.api().ajax.reload();
+    reloadTable: function () {
+        this.table.api().ajax.reload();
 
     },
-    jcrop: function (size) {
-        $('#images-crop').Jcrop({
-            allowResize: false,
-            setSelect: $.parseJSON(size),
-            onSelect: ImageWriter.setParamSelect
-        }, function () {
-            ImageWriter.jcropApi = this;
+    insetCropedImaged: function(){
+
+    },
+    saveDialog: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-primary',
+                    text: $().technomedia.btnSaveOk,
+                    onClick: function (noty) {
+                        noty.close();
+                        ImageWriter.addCropImages();
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnSaveCancel,
+                    onClick: function (noty) {
+                        noty.close();
+                    }
+                }
+            ]
         });
     },
-    setParamSelect: function (c) {
-        $('#x').val(c.x);
-        $('#y').val(c.y);
-        $('#w').val(c.w);
-        $('#h').val(c.h);
+    addCropImages: function () {
+        $.post(getBaseUrl() + 'multimedia/images/crop', {
+            imagesId: $('#imagesId').val(),
+            imagesSizeId: $('input:radio[name=imagesSize]:checked').val(),
+            x: $('#x').val(),
+            y: $('#y').val(),
+            w: $('#w').val(),
+            h: $('#h').val()
+        }, function (json) {
+            console.log(json);
+            if (json.success) {
+                ImageWriter.setMessageTpl($().technomedia.saveCropImagesOkMessage)
+            } else {
+                ImageWriter.setMessageTpl($().technomedia.totalError)
+            }
+        }, 'json');
     },
-    saveImages: function () {
+    setMessageTpl: function (message) {
+        noty({
+            text: message,
+            type: 'alert',
+            dismissQueue: true,
+            layout: 'center',
+            theme: 'defaultTheme',
+            buttons: [
+                {
+                    addClass: 'btn btn-success',
+                    text: $().technomedia.btnNext,
+                    onClick: function (noty) {
+                        noty.close();
+                    }
+                },
+                {
+                    addClass: 'btn btn-danger',
+                    text: $().technomedia.btnList,
+                    onClick: function (noty) {
+                        noty.close();
+                        $(location).attr('href', getBaseUrl() + 'multimedia/images/')
+                    }
+                }
+            ]
+        });
+    },
+    addImages: function () {
         var fd = new FormData();
         fd.append('name', $('#name').val());
         fd.append('description', $('#description').val());
@@ -1088,10 +1182,8 @@ var ImageWriter = {
     },
     setErrorForm: function (error) {
         $.each(error, function (k, v) {
-
             if (k === 'failureSave')
                 Rubric.setMessageTpl(v);
-
             $('#' + k + '_warning').noty({
                 text: '<i class="glyphicon glyphicon-exclamation-sign"></i> ' + v,
                 type: 'warning',
@@ -1102,9 +1194,50 @@ var ImageWriter = {
             });
         })
     }
-
 };
 
+var ImageCrop = {
+    api: null,
+    boundx: null,
+    boundy: null,
+
+    preview: $('#preview-pane'),
+    pcnt: $('.preview-container'),
+    pimg: $('.preview-container img'),
+    xsize: $('.preview-container').width(),
+    ysize: $('.preview-container').height(),
+
+    init: function () {
+        $('#target').Jcrop({
+            onChange: ImageCrop.updatePreview,
+            onSelect: ImageCrop.updatePreview,
+            aspectRatio: ImageCrop.xsize / ImageCrop.ysize
+        }, function () {
+            var bounds = this.getBounds();
+            ImageCrop.boundx = bounds[0];
+            ImageCrop.boundy = bounds[1];
+            ImageCrop.api = this;
+            ImageCrop.api.setSelect([10, 10, ImageCrop.xsize, ImageCrop.ysize]);
+            ImageCrop.api.setOptions({bgColor: 'white', bgOpacity: 0.7});
+        });
+    },
+    updatePreview: function (c) {
+        if (parseInt(c.w) > 0) {
+            var rx = ImageCrop.xsize / c.w;
+            var ry = ImageCrop.ysize / c.h;
+            ImageCrop.pimg.css({
+                width: Math.round(rx * ImageCrop.boundx) + 'px',
+                height: Math.round(ry * ImageCrop.boundy) + 'px',
+                marginLeft: '-' + Math.round(rx * c.x) + 'px',
+                marginTop: '-' + Math.round(ry * c.y) + 'px'
+            });
+        }
+        $('#x').val(c.x);
+        $('#y').val(c.y);
+        $('#w').val(c.w);
+        $('#h').val(c.h);
+    }
+};
 
 SelectedRubric.init();
 News.init();

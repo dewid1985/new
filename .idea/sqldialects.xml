@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file:///srv/www/platform/migrations/addMultimediaSchemaAndTables.sql" dialect="PostgreSQL" />
     <file url="file:///srv/www/platform/migrations/createBaseDataBases.sql" dialect="PostgreSQL" />
     <file url="file:///srv/www/platform/migrations/insertDemoData.sql" dialect="PostgreSQL" />
+    <file url="file:///srv/www/platform/migrations/newUpdateDataBases.sql" dialect="PostgreSQL" />
   </component>
 </project>
-

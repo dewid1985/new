@@ -42,11 +42,13 @@
                                     <div class="col-sm-12">
                                         <div class="row">
                                             <div class="col-xs-6 col-sm-6">
-                                                <input id="of_uploaded_at" class="form-control date" name="of_uploaded_at"
+                                                <input id="of_uploaded_at" class="form-control date"
+                                                       name="of_uploaded_at"
                                                        placeholder="от:">
                                             </div>
                                             <div class="col-xs-6 col-sm-6">
-                                                <input id="to_uploaded_at" class="form-control date" name="to_uploaded_at"
+                                                <input id="to_uploaded_at" class="form-control date"
+                                                       name="to_uploaded_at"
                                                        placeholder="до:">
                                             </div>
                                         </div>
@@ -80,8 +82,10 @@
                             <th>id</th>
                             <th>Название</th>
                             <th>Описание</th>
-                            <th>Иконка</th>
+                            <th class="text-center">Иконка</th>
                             <th>Дата загрузки</th>
+                            <th>Кол-во гот.фото</th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tfoot>
@@ -89,8 +93,10 @@
                             <th>id</th>
                             <th>Название</th>
                             <th>Описание</th>
-                            <th>Иконка</th>
+                            <th class="text-center">Иконка</th>
                             <th>Дата загрузки</th>
+                            <th>Кол-во гот.фото</th>
+                            <th></th>
                         </tr>
                         </tfoot>
                     </table>
@@ -98,6 +104,6 @@
             </div>
         </div>
     </div>
-
+<?php $partViewer->view('html-helper/cropped-images-show') ?>
 <?php $partViewer->view('html-helper/loader'); ?>
 <?php $partViewer->view('layouts/footer'); ?>

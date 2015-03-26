@@ -25,5 +25,9 @@ $.fn.technomedia = {
     treeRubricsName:['Дерево рубрик'],
     addRubricMessageOkBtnList:['Список рубрик'],
     addRubricMessageOkBtnNew:['Новая `Рубрика`'],
-    addRubricMessageOk:['Рубрика успешно сохраненна']
+    addRubricMessageOk:['Рубрика успешно сохраненна'],
+    addCropImagesMessage:['Вы действительно хотите, сохранить выделенную область изображения?'],
+    saveCropImagesOkMessage:['Изображение успешно сохраненно'],
+    btnNext: ['Продолжить'],
+    btnList: ['Список']
 };

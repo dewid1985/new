@@ -7,12 +7,13 @@
     <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact"/>
     <schema name="common" catalog="platform_test"/>
     <schema name="logs" catalog="platform_test"/>
+    <schema name="multimedia" catalog="platform_test"/>
     <schema name="users" catalog="platform_test"/>
     <table name="article" schema="common" catalog="platform_test" type="TABLE">
-      <column name="id" sqlType="serial" precision="10" scale="0" nullable="false" jdbcType="4" def="bmV4dHZhbCgnY29tbW9uLmFydGljbGVfaWRfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
-      <column name="project_id" sqlType="int2" precision="5" scale="0" nullable="true" jdbcType="5"/>
-      <column name="article_draft_id" sqlType="int4" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="article_published_id" sqlType="int4" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="id" sqlType="bigserial" precision="19" scale="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY29tbW9uLmFydGljbGVfaWRfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
+      <column name="project_id" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="article_draft_id" sqlType="int8" precision="19" scale="0" nullable="true" jdbcType="-5"/>
+      <column name="article_published_id" sqlType="int8" precision="19" scale="0" nullable="true" jdbcType="-5"/>
       <column name="created_at" sqlType="timestamptz" precision="35" scale="6" nullable="true" jdbcType="93"/>
       <column name="published_at" sqlType="timestamptz" precision="35" scale="6" nullable="true" jdbcType="93"/>
       <column name="published" sqlType="bool" precision="1" scale="0" nullable="true" jdbcType="-7"/>
@@ -25,29 +26,29 @@
       <index name="index_article_published_at" unique="false" columns="published_at"/>
     </table>
     <table name="article_draft" schema="common" catalog="platform_test" type="TABLE">
-      <column name="id" sqlType="serial" precision="10" scale="0" nullable="false" jdbcType="4" def="bmV4dHZhbCgnY29tbW9uLmFydGljbGVfZHJhZnRfaWRfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
-      <column name="article_id" sqlType="int4" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="admin_id" sqlType="int4" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="title" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
-      <column name="anons" sqlType="varchar" precision="1024" scale="0" nullable="true" jdbcType="12"/>
-      <column name="text" sqlType="text" precision="2147483647" scale="0" nullable="true" jdbcType="12"/>
-      <column name="author" sqlType="varchar" precision="2147483647" scale="0" nullable="true" jdbcType="12"/>
-      <column name="meta_description" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
-      <column name="meta_keywords" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <column name="id" sqlType="bigserial" precision="19" scale="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY29tbW9uLmFydGljbGVfZHJhZnRfaWRfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
+      <column name="article_id" sqlType="int8" precision="19" scale="0" nullable="true" jdbcType="-5"/>
+      <column name="admin_id" sqlType="int8" precision="19" scale="0" nullable="true" jdbcType="-5"/>
+      <column name="title" sqlType="text" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="anons" sqlType="text" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="text" sqlType="text" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="author" sqlType="text" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="meta_description" sqlType="text" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="meta_keywords" sqlType="text" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
       <column name="rubrics" sqlType="hstore" precision="2147483647" scale="0" nullable="true" jdbcType="1111"/>
       <column name="modified_at" sqlType="timestamptz" precision="35" scale="6" nullable="true" jdbcType="93"/>
-      <column name="preview" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <column name="preview" sqlType="text" precision="2147483647" scale="0" nullable="true" jdbcType="12"/>
       <primary-key name="pk__article_draft" columns="id"/>
       <foreign-key name="fk__article_id" columns="article_id" ref-table="article" ref-schema="common" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2"/>
       <foreign-key name="fk_admin_id" columns="admin_id" ref-table="admin" ref-schema="users" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2"/>
       <exported-key name="fk__article_draft_id" table="article" schema="common" catalog="platform_test" columns="article_draft_id"/>
       <index name="index__article_draft_modified_at" unique="false" columns="modified_at"/>
       <index name="index__article_draft_rubrics" unique="false" columns="rubrics"/>
-      <index name="index_fti_articles_draft_anons" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(anons)::text)"/>
-      <index name="index_fti_articles_draft_meta_description" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(meta_description)::text)"/>
-      <index name="index_fti_articles_draft_meta_keywords" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(meta_keywords)::text)"/>
+      <index name="index_fti_articles_draft_anons" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,anons)"/>
+      <index name="index_fti_articles_draft_meta_description" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,meta_description)"/>
+      <index name="index_fti_articles_draft_meta_keywords" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,meta_keywords)"/>
       <index name="index_fti_articles_draft_text" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,text)"/>
-      <index name="index_fti_articles_draft_title" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(title)::text)"/>
+      <index name="index_fti_articles_draft_title" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,title)"/>
     </table>
     <table name="article_draft_id_seq" schema="common" catalog="platform_test" type="SEQUENCE">
       <column name="sequence_name" sqlType="name" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
@@ -321,6 +322,8 @@
       <column name="description" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
       <primary-key name="pk__rubric_data" columns="id"/>
       <exported-key name="fk__rubric_data_id" table="rubric" schema="common" catalog="platform_test" columns="rubric_data_id"/>
+      <index name="index_fti_rubric_data_description" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(description)::text)"/>
+      <index name="index_fti_rubric_data_short_name" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(short_name)::text)"/>
       <index name="index_rubric_data_short_name" unique="false" columns="short_name"/>
     </table>
     <table name="rubric_data_id_seq" schema="common" catalog="platform_test" type="SEQUENCE">
@@ -373,6 +376,80 @@
       <index name="index__admin_auth_logs_white_ip_list_id" unique="false" columns="white_ip_list_id"/>
     </table>
     <table name="admin_auth_logs_id_seq" schema="logs" catalog="platform_test" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" precision="1" scale="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" precision="1" scale="0" nullable="false" jdbcType="-7"/>
+    </table>
+    <table name="cropped_images" schema="multimedia" catalog="platform_test" type="TABLE">
+      <column name="id" sqlType="serial" precision="10" scale="0" nullable="false" jdbcType="4" def="bmV4dHZhbCgnbXVsdGltZWRpYS5jcm9wcGVkX2ltYWdlc19pZF9zZXEnOjpyZWdjbGFzcyk=" autoIncrement="true"/>
+      <column name="images_id" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="images_size_id" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="path" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <primary-key name="pk__cropped_images" columns="id"/>
+      <foreign-key name="fk__images_id" columns="images_id" ref-table="images" ref-schema="multimedia" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2"/>
+      <foreign-key name="fk__images_size_id" columns="images_size_id" ref-table="images_size" ref-schema="multimedia" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2"/>
+      <index name="index__images_id" unique="false" columns="images_id"/>
+      <index name="index__images_size_id" unique="false" columns="images_size_id"/>
+    </table>
+    <table name="cropped_images_id_seq" schema="multimedia" catalog="platform_test" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" precision="1" scale="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" precision="1" scale="0" nullable="false" jdbcType="-7"/>
+    </table>
+    <table name="images" schema="multimedia" catalog="platform_test" type="TABLE">
+      <column name="id" sqlType="serial" precision="10" scale="0" nullable="false" jdbcType="4" def="bmV4dHZhbCgnbXVsdGltZWRpYS5pbWFnZXNfaWRfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
+      <column name="name" sqlType="varchar" precision="32" scale="0" nullable="true" jdbcType="12"/>
+      <column name="title" sqlType="varchar" precision="32" scale="0" nullable="true" jdbcType="12"/>
+      <column name="description" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <column name="tags" sqlType="varchar" precision="512" scale="0" nullable="true" jdbcType="12"/>
+      <column name="mime_type" sqlType="varchar" precision="128" scale="0" nullable="true" jdbcType="12"/>
+      <column name="source_file" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <column name="prepared_file" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <column name="ico_file" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <column name="uploaded_at" sqlType="timestamptz" precision="35" scale="6" nullable="true" jdbcType="93"/>
+      <column name="root_directory" sqlType="varchar" precision="256" scale="0" nullable="true" jdbcType="12"/>
+      <primary-key name="pk__images" columns="id"/>
+      <exported-key name="fk__images_id" table="cropped_images" schema="multimedia" catalog="platform_test" columns="images_id"/>
+      <index name="index__fti_images_description" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(description)::text)"/>
+      <index name="index__fti_images_tags" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(tags)::text)"/>
+      <index name="index__fti_images_title" unique="false" columns="to_tsvector(&apos;utf8_russian&apos;::regconfig,(title)::text)"/>
+    </table>
+    <table name="images_id_seq" schema="multimedia" catalog="platform_test" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" precision="1" scale="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" precision="1" scale="0" nullable="false" jdbcType="-7"/>
+    </table>
+    <table name="images_size" schema="multimedia" catalog="platform_test" type="TABLE">
+      <column name="id" sqlType="serial" precision="10" scale="0" nullable="false" jdbcType="4" def="bmV4dHZhbCgnbXVsdGltZWRpYS5pbWFnZXNfc2l6ZV9pZF9zZXEnOjpyZWdjbGFzcyk=" autoIncrement="true"/>
+      <column name="name" sqlType="varchar" precision="32" scale="0" nullable="true" jdbcType="12"/>
+      <column name="title" sqlType="varchar" precision="32" scale="0" nullable="true" jdbcType="12"/>
+      <column name="width" sqlType="int4" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="height" sqlType="int4" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <primary-key name="pk__sizes_to_crop_image" columns="id"/>
+      <exported-key name="fk__images_size_id" table="cropped_images" schema="multimedia" catalog="platform_test" columns="images_size_id"/>
+    </table>
+    <table name="images_size_id_seq" schema="multimedia" catalog="platform_test" type="SEQUENCE">
       <column name="sequence_name" sqlType="name" precision="2147483647" scale="0" nullable="false" jdbcType="12"/>
       <column name="last_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>
       <column name="start_value" sqlType="int8" precision="19" scale="0" nullable="false" jdbcType="-5"/>

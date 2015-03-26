@@ -43,10 +43,10 @@ Logger::me()
     ->setLevel(LogLevel::finest())
     ->add(
         GrayLogLogger2::create(GraylogPublisher::create(GRAYLOG_HOST))
-            ->setFacility(getenv('PROJECT_SERVER_TYPE'))
+            ->setFacility(':AdminPanel')
     );
 
-try {
+//try {
     Session::start();
 
     Platform::create()->init();
@@ -86,6 +86,6 @@ try {
         ->add(WebAppViewHandler::create());
 
     $application->run();
-} catch (Exception $e) {
-    Logger::me()->exception($e);
-}
+//} catch (Exception $e) {
+//    Logger::me()->exception($e);
+//}

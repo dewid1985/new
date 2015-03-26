@@ -17,6 +17,10 @@ class MultimediaController extends ProjectAuthMappedController
     /** @var Module */
     protected $module;
 
+    protected $previewHeight = NULL;
+
+    protected $previewWidth = NULL;
+
     /**
      * @return Form
      */
@@ -43,6 +47,38 @@ class MultimediaController extends ProjectAuthMappedController
         return $this->module;
     }
 
+    /**
+     * @param null $previewHeight
+     */
+    public function setPreviewHeight($previewHeight)
+    {
+        $this->previewHeight = $previewHeight;
+    }
+
+    /**
+     * @param null $previewWidth
+     */
+    public function setPreviewWidth($previewWidth)
+    {
+        $this->previewWidth = $previewWidth;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPreviewHeight()
+    {
+        return $this->previewHeight;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPreviewWidth()
+    {
+        return $this->previewWidth;
+    }
+
 
     /**
      * @return ModelAndView
@@ -54,6 +90,11 @@ class MultimediaController extends ProjectAuthMappedController
             ->setView('multimedia/image-upload');
     }
 
+    /**
+     * @param HttpRequest $request
+     * @return JsonView|ModelAndView
+     * @throws PlatfromModuleException
+     */
     public function uploadImageAction(HttpRequest $request)
     {
         $responseView = ProjectResponseView::create();
@@ -114,46 +155,125 @@ class MultimediaController extends ProjectAuthMappedController
                 ->setSuccess(TRUE)
                 ->setData('ico', $response->getIcoPath())
         );
-
     }
 
-    public function imagesAction(HttpRequest $request)
+    /**
+     * @return ModelAndView
+     */
+    public function imagesAction()
     {
         return ModelAndView::create()
             ->setModel(Model::create())
             ->setView('multimedia/images-list');
     }
 
+    /**
+     * @param HttpRequest $request
+     * @return ModelAndView
+     * @throws PlatfromModuleException
+     */
     public function imagesListAction(HttpRequest $request)
     {
         $this->setForm($this->getValidatedImagesSearchForm()->import($request->getGet()));
 
-            $this->getModule()->getModuleObject()->setRequest(
-                ModuleMultimediaSearchOperationRequest::create()
-                    ->setDraw($this->getForm()->get('draw')->getValue())
-                    ->setOffset($this->getForm()->get('start')->getValue())
-                    ->setLimit($this->getForm()->get('length')->getValue())
-                    ->setOfUploadedAt($this->getForm()->get('of_uploaded_at')->getValue())
-                    ->setToUploadedAt($this->getForm()->get('to_uploaded_at')->getValue())
-                    ->setTitle($this->getForm()->get('title')->getValue())
-                    ->setDescription($this->getForm()->get('description')->getValue())
+        $this->getModule()->getModuleObject()->setRequest(
+            ModuleMultimediaSearchOperationRequest::create()
+                ->setDraw($this->getForm()->get('draw')->getValue())
+                ->setOffset($this->getForm()->get('start')->getValue())
+                ->setLimit($this->getForm()->get('length')->getValue())
+                ->setOfUploadedAt($this->getForm()->get('of_uploaded_at')->getValue())
+                ->setToUploadedAt($this->getForm()->get('to_uploaded_at')->getValue())
+                ->setTitle($this->getForm()->get('title')->getValue())
+                ->setDescription($this->getForm()->get('description')->getValue())
+                ->setTags($this->getForm()->get('tags')->getValue())
+        );
+
+        $this->getModule()->init(MultimediaOperationEnum::searchImages());
+
+        /** @var ModuleMultimediaSearchOperationResponse $response */
+        $response = $this->getModule()->getModuleObject()->getResponse();
+
+        return ModelAndView::create()
+            ->setModel(
+                Model::create()
+                    ->set('draw', $response->getDraw())
+                    ->set('recordsTotal', $response->getRecordsTotal())
+                    ->set('recordsFiltered', $response->getRecordsFiltered())
+                    ->set('data', $response->getData())
+            )
+            ->setView(JsonView::create());
+    }
+
+    /**
+     * @return JsonView|ModelAndView
+     */
+    public function cropAction(HttpRequest $request)
+    {
+        $this->getModule()->getModuleObject()->setRequest(
+            ModuleMultimediaGetImageOperationRequest::create()
+                ->setSizesId($request->getAttachedVar('sizeId'))
+                ->setId($request->getAttachedVar('imageId'))
+        );
+
+        $this->getModule()->init(MultimediaOperationEnum::getImage());
+
+        /** @var ModuleMultimediaGetImageOperationResponse $image */
+        $image = $this->getModule()->getModuleObject()->getResponse();
+
+        if ($image->getImagesPreviewSizes()) {
+            $this->setPreviewWidth($image->getImagesPreviewSizes()->getWidth());
+            $this->setPreviewHeight($image->getImagesPreviewSizes()->getHeight());
+        }
+
+        return $this->getModelAndView(
+            ProjectResponseView::create()
+                ->setData('image', $image->getPreparedFile())
+                ->setData('imageId', $image->getId())
+                ->setData(
+                    'sizes',
+                    $this->preparedDataSizes($image->getImagesSizes(), $request->getAttachedVar('sizeId'))
+                )
+                ->setData('previewSizes', ['width' => $this->getPreviewWidth(), 'height' => $this->getPreviewHeight()])
+                ->setTpl('multimedia/crop')
+        );
+    }
+
+    public function cropImageAction(HttpRequest $request)
+    {
+        try {
+            $this->setForm(
+                $this
+                    ->getValidatedCropImagesForm()
+                    ->import($request->getPost())
             );
 
-            $this->getModule()->init(MultimediaOperationEnum::searchImages());
+            if (!empty($this->getForm()->getErrors())) {
+                return $this->getModelAndView(ProjectResponseView::create()->setSuccess(FALSE));
+            }
 
-            /** @var ModuleMultimediaSearchOperationResponse $response */
-            $response = $this->getModule()->getModuleObject()->getResponse();
+            /** @var  ModuleMultimediaCropImageOperationRequest $requestModule */
+            $requestModule = ModuleMultimediaCropImageOperationRequest::create()
+                ->setImagesId($this->getForm()->get('imagesId')->getValue())
+                ->setImagesSizeId($this->getForm()->get('imagesSizeId')->getValue())
+                ->setCoordinateX($this->getForm()->get('x')->getValue())
+                ->setCoordinateY($this->getForm()->get('y')->getValue())
+                ->setWidth($this->getForm()->get('w')->getValue())
+                ->setHeight($this->getForm()->get('h')->getValue());
 
-            return ModelAndView::create()
-                ->setModel(
-                    Model::create()
-                        ->set('draw', $response->getDraw())
-                        ->set('recordsTotal', $response->getRecordsTotal())
-                        ->set('recordsFiltered', $response->getRecordsFiltered())
-                        ->set('data', $response->getData())
-                )
-                ->setView(JsonView::create());
+            $this->getModule()->getModuleObject()->setRequest($requestModule);
+            $this->getModule()->init(MultimediaOperationEnum::cropImage());
 
+            return $this->getModelAndView(
+                ProjectResponseView::create()
+                    ->setSuccess(TRUE)
+            );
+        }catch (Exception $e)
+        {
+            Logger::me()->exception($e);
+            return $this->getModelAndView(
+                ProjectResponseView::create()->setSuccess(FALSE)
+            );
+        }
     }
 
     /**
@@ -176,6 +296,7 @@ class MultimediaController extends ProjectAuthMappedController
      */
     protected function getValidatedFormUploadedFileTextField()
     {
+
         return Form::create()
             ->set(Primitive::string('name')->required())
             ->addMissingLabel('name', PlatformFileUploadMessageEnum::getErrorRequiredName()->getName())
@@ -185,8 +306,10 @@ class MultimediaController extends ProjectAuthMappedController
             ->addMissingLabel('tags', PlatformFileUploadMessageEnum::getErrorRequiredTags()->getName());
     }
 
-
-    public function getValidatedImagesSearchForm()
+    /**
+     * @return Form
+     */
+    protected function getValidatedImagesSearchForm()
     {
         return Form::create()
             ->add(Primitive::integer('draw')->required())
@@ -197,6 +320,43 @@ class MultimediaController extends ProjectAuthMappedController
             ->add(Primitive::string('tags'))
             ->add(Primitive::timestampTZ('of_uploaded_at'))
             ->add(Primitive::timestampTZ('to_uploaded_at'));
+    }
+
+
+    /**
+     * @return Form
+     */
+    protected function getValidatedCropImagesForm()
+    {
+        return Form::create()
+            ->add(Primitive::float('x')->required())
+            ->add(Primitive::float('y')->required())
+            ->add(Primitive::float('w')->required())
+            ->add(Primitive::float('h')->required())
+            ->add(Primitive::integer('imagesSizeId')->required())
+            ->add(Primitive::integer('imagesId')->required());
+    }
+
+
+    /**
+     * @param $array
+     * @param null $id
+     * @return array
+     */
+    private function preparedDataSizes($array, $id = null)
+    {
+        $r = [];
+        foreach ($array as $k => $v) {
+            if (is_null($id) && $k == 0) {
+                $v['checked'] = true;
+            } elseif ($v['id'] == $id) {
+                $v['checked'] = true;
+            } else {
+                $v['checked'] = false;
+            }
+            $r[] = $v;
+        }
+        return $r;
     }
 
     /**
@@ -213,7 +373,9 @@ class MultimediaController extends ProjectAuthMappedController
             'image' => 'imageAction',
             'upload' => 'uploadImageAction',
             'images' => 'imagesAction',
-            'imagesList' => 'imagesListAction'
+            'imagesList' => 'imagesListAction',
+            'crop' => 'cropAction',
+            'cropImage' => 'cropImageAction'
         ];
     }
 }

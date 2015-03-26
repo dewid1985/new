@@ -1,0 +1,94 @@
+<?php $partViewer->view('layouts/header'); ?>
+<?php $partViewer->view('menu/up_menu'); ?>
+
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Резать фотографию</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="glyphicon glyphicon-resize-full"></i>
+                Размеры изображения
+            </div>
+            <div class="panel-body">
+                <form action="<?php echo Project::getBaseUrl()?>multimedia/images/crop/<?php echo $data['image'][0]?>">
+                    <div class="form-group">
+                        <?php foreach ($data['sizes'] as $imageSize): ?>
+                            <div class="radio">
+                                <label>
+                                    <input id="optionsRadios1" name="imagesSize" type="radio"
+                                        <?php if ($imageSize['checked']) echo('checked') ?>
+                                           value="<?php echo $imageSize['id'] ?>" >
+                                    <?php
+                                    echo '(' . $imageSize['width'] . 'x' . $imageSize['height'] . ')' .
+                                        $imageSize['title'];
+                                    ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+            </div>
+            <div class="panel-footer">
+                <div id="select-size" type="submit" class="btn btn-primary" >
+                    <i class="fa fa-crop fa-fw"></i>
+                    Выбрать
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div id="block_prepared" class="col-md-6">
+                        <div class="scroll-box-image">
+                            <img
+                                src="http://admin.shein.pravda.local/images/upload/<?php echo $data['image'] ?>"
+                                id="target"
+                                alt="[Jcrop Example]"/>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div id="preview-pane">
+                            <div class="preview-container" style="
+                            height: <?php isset($data['previewSizes']['height']) AND print($data['previewSizes']['height']) OR print($data['sizes'][0]['height'])?>px;
+                            width:<?php isset($data['previewSizes']['width']) AND print($data['previewSizes']['width']) OR print($data['sizes'][0]['width'])?>px;
+                            overflow: hidden;
+                            ">
+                                <img
+                                    src="http://admin.shein.pravda.local/images/upload/<?php echo $data['image'] ?>"
+                                    class="jcrop-preview" alt="Preview"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div id="crop-image" type="submit" class="btn btn-primary" type="button">
+                    <i class="fa fa-save fa-fw"></i>
+                    Сохранить
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form>
+        <input type="hidden" id="imagesId" name="imagesId" value="<?php echo $data['imageId'];?>"/>
+        <input type="hidden" id="x" name="x" />
+        <input type="hidden" id="y" name="y" />
+        <input type="hidden" id="w" name="w" />
+        <input type="hidden" id="h" name="h" />
+    </form>
+
+
+</div>
+<?php $partViewer->view('html-helper/cropped-images-show')?>
+<?php $partViewer->view('html-helper/loader'); ?>
+<?php $partViewer->view('layouts/footer'); ?>
