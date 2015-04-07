@@ -37,7 +37,7 @@ tinyMCE.init({
     mode: "textareas",
     language: 'ru',
     editor_selector: "Editor",
-    plugins: ['media', 'image']
+    plugins: ['media', 'ImagePluginTechnomedia', 'ImageArticlePluginTechnomedia','print']
 });
 
 $('.form_datetime').datetimepicker({
@@ -55,7 +55,207 @@ var getBaseUrl = function () {
     return 'http://' + location.host + '/';
 };
 
+/***** ImagePluginTechnomedia ****/
+tinymce.PluginManager.add('ImagePluginTechnomedia', function (editor) {
 
+    function buildListItems(inputList, itemCallback, startItems) {
+        function appendItems(values, output) {
+            output = output || [];
+
+            tinymce.each(values, function (item) {
+                var menuItem = {text: item.text || item.title};
+
+                if (item.menu) {
+                    menuItem.menu = appendItems(item.menu);
+                } else {
+                    menuItem.value = item.value;
+                    itemCallback(menuItem);
+                }
+
+                output.push(menuItem);
+            });
+
+            return output;
+        }
+
+        return appendItems(inputList, startItems || []);
+    }
+
+    function createImageList(callback) {
+        return function () {
+            var imageList = editor.settings.image_list;
+
+            if (typeof imageList == "string") {
+                tinymce.util.XHR.send({
+                    url: imageList,
+                    success: function (text) {
+                        callback(tinymce.util.JSON.parse(text));
+                    }
+                });
+            } else if (typeof imageList == "function") {
+                imageList(callback);
+            } else {
+                callback(imageList);
+            }
+        };
+    }
+
+    function showDialog(imageList) {
+        InsertImagesPlugin.init();
+        $('#insert_images_in_materials').modal('show');
+        $('#preview-list').on('click', '#insert_image', function () {
+            var img = $($(this).parent()).children('img');
+            onSubmitForm($(img).attr('src'));
+            $('#insert_images_in_materials, #inserting-images-preview').modal('hide');
+            $('#').modal('hide');
+        });
+        var win, data = {}, dom = editor.dom, imgElm = editor.selection.getNode();
+        var width, height, imageListCtrl;
+
+        function onSubmitForm(src) {
+            /**Может пригодится **/
+            data.alt = '';
+            data.title = '';
+            data.width = null;
+            data.height = null;
+            data.style = null;
+
+            data = {
+                src: src,
+                alt: data.alt,
+                title: data.title,
+                width: data.width,
+                height: data.height,
+                style: data.style,
+                "class": data["class"]
+            };
+
+            editor.undoManager.transact(function () {
+                if (!data.src) {
+                    if (imgElm) {
+                        dom.remove(imgElm);
+                        editor.focus();
+                        editor.nodeChanged();
+                    }
+
+                    return;
+                }
+
+                if (data.title === "") {
+                    data.title = null;
+                }
+                var id = $(imgElm).length + 1;
+                if (!imgElm) {
+                    data.id = id;
+                    editor.focus();
+                    editor.selection.setContent(dom.createHTML('img', data));
+                    imgElm = dom.get(id);
+                    dom.setAttrib(imgElm, id, null);
+                } else {
+                    dom.setAttribs(imgElm, data);
+                }
+
+            });
+        }
+
+        width = dom.getAttrib(imgElm, 'width');
+        height = dom.getAttrib(imgElm, 'height');
+
+        if (imgElm.nodeName == 'IMG' && !imgElm.getAttribute('data-mce-object') && !imgElm.getAttribute('data-mce-placeholder')) {
+            data = {
+                src: dom.getAttrib(imgElm, 'src'),
+                alt: dom.getAttrib(imgElm, 'alt'),
+                title: dom.getAttrib(imgElm, 'title'),
+                "class": dom.getAttrib(imgElm, 'class'),
+                width: width,
+                height: height
+            };
+        } else {
+            imgElm = null;
+        }
+
+        if (imageList) {
+            imageListCtrl = {
+                type: 'listbox',
+                label: 'Image list',
+                values: buildListItems(
+                    imageList,
+                    function (item) {
+                        item.value = editor.convertURL(item.value || item.url, 'src');
+                    },
+                    [{text: 'None', value: ''}]
+                ),
+                value: data.src && editor.convertURL(data.src, 'src'),
+                onselect: function (e) {
+                    var altCtrl = win.find('#alt');
+
+                    if (!altCtrl.value() || (e.lastControl && altCtrl.value() == e.lastControl.text())) {
+                        altCtrl.value(e.control.text());
+                    }
+
+                    win.find('#src').value(e.control.value()).fire('change');
+                },
+                onPostRender: function () {
+                    imageListCtrl = this;
+                }
+            };
+        }
+    }
+
+    editor.addButton('image', {
+        icon: 'image',
+        tooltip: 'Вставить изображение из каталога',
+        onclick: createImageList(showDialog),
+        stateSelector: 'img:not([data-mce-object],[data-mce-placeholder])'
+    });
+
+    editor.addMenuItem('image', {
+        icon: 'image',
+        text: 'Вставить изображение из каталога',
+        onclick: createImageList(showDialog),
+        context: 'insert',
+        prependToContext: true
+    });
+
+  //  editor.addCommand('mceImage', createImageList(showDialog));
+});
+/***** end ImagePluginTechnomedia ****/
+
+tinymce.PluginManager.add('ImageArticlePluginTechnomedia', function (editor) {
+
+    function showDialogUploadImage()
+    {
+        $('#upload-and-paste-images-in-materials').modal('show');
+
+    }
+
+    function init(callback) {
+        return function () {
+            var imageList = editor.settings.image_list;
+
+            if (typeof imageList == "string") {
+                tinymce.util.XHR.send({
+                    url: imageList,
+                    success: function (text) {
+                        callback(tinymce.util.JSON.parse(text));
+                    }
+                });
+            } else if (typeof imageList == "function") {
+                imageList(callback);
+            } else {
+                callback(imageList);
+            }
+        };
+    }
+
+    editor.addMenuItem('imagearicle',{
+        icon:'paste',
+        text: 'Загрузить изображение',
+        onclick: init(showDialogUploadImage),
+        context: 'insert',
+        prependToContext: true
+    })
+});
 /**articles**/
 /**********************************************************************************************************************/
 
@@ -119,8 +319,18 @@ var Articles = {
             Articles.saveDialog($().technomedia.saveArticleDialog);
         });
 
-        $('#search_article').click(function () {
-            Articles.reloadTable();
+
+        $('#article').on('click','#insert-img', function () {
+            InsertImagesPlugin.init();
+            $('#insert_images_in_materials').modal('show');
+            localStorage.setItem('field-image-id',$(this).parent().parent().children('input').attr('id'));
+            Articles.insertImgToInput()
+
+        });
+        $('#article').on('click','#preview-image', function () {
+            InsertImagesPlugin.init();
+            $('#inserting-show-image').modal('show');
+            $('#show_image').attr('src',$(this).parent().parent().children('input').val());
         });
 
         if (!!localStorage.getItem('articleId'))
@@ -128,6 +338,13 @@ var Articles = {
     },
     reloadTable: function () {
         this.table.api().ajax.reload();
+    },
+    insertImgToInput: function () {
+        $('#preview-list').on( 'click','#insert_image', function () {
+            $('#'+localStorage.getItem('field-image-id')).val($(this).parent().children('img').attr('src'));
+            $('#insert_images_in_materials, #inserting-images-preview').modal('hide');
+            localStorage.removeItem('field-image-id');
+        });
     },
     get: function () {
         var articleId = localStorage.getItem('articleId');
@@ -281,8 +498,10 @@ var Articles = {
         var selectedDivRubric = $("#rubric");
         $.each(rubrics, function (k, v) {
             selectedDivRubric.append(
-                '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
-                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name + '" name="' + k + '" value="' + v.name + '">'
+                '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right: 3px" ' +
+                'type="button">' + v.short_name + ' ×</button>' +
+                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name + '" name="' +
+                k + '" value="' + v.name + '">'
             );
         });
     }
@@ -381,7 +600,6 @@ var News = {
             },
             success: function (json) {
                 json = $.parseJSON(json);
-                console.log(json);
                 tinymce.get('text').setContent(json.data.text);
                 $.each(json.data, function (k, v) {
                     if (k == 'rubrics') {
@@ -513,8 +731,11 @@ var News = {
         var selectedDivRubric = $("#rubric");
         $.each(rubrics, function (k, v) {
             selectedDivRubric.append(
-                '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right: 3px" type="button">' + v.short_name + ' ×</button>' +
-                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name + '" name="' + k + '" value="' + v.name + '">'
+                '<button data-id="' + v.name + '" class="btn btn-default btn-xs" style="margin-right:' +
+                ' 3px" type="button">'
+                + v.short_name + ' ×</button>' +
+                '<input id="rubric_' + v.name + '" hidden=""  data-id="' + v.name
+                + '" name="' + k + '" value="' + v.name + '">'
             );
         });
     }
@@ -635,7 +856,7 @@ var Rubric = {
         $.ajax({
             type: "post",
             url: Rubric.url + 'get/' + rubricId,
-            dataType:"json",
+            dataType: "json",
             error: function () {
                 News.setMessageTpl($().technomedia.totalError)
             },
@@ -967,8 +1188,8 @@ var ImageWriter = {
                 ' data-holder-rendered="true" src="' + getBaseUrl() + 'images/upload/' + json.data[i].ico_file +
                 '" style=" display: block;max-width: 30%; max-height: 30%;" alt="140x140">';
 
-                if(json.data[i].count_cropped > 0)
-                    json.data[i].count_cropped = '<strong>'+json.data[i].count_cropped + '</strong>&nbsp;<button ' +
+                if (json.data[i].count_cropped > 0)
+                    json.data[i].count_cropped = '<strong>' + json.data[i].count_cropped + '</strong>&nbsp;<button ' +
                     'class="btn btn-default btn-circle" id="show_images"' +
                     ' type="button"> <i class="glyphicon glyphicon-search "></i></button>';
             }
@@ -997,7 +1218,7 @@ var ImageWriter = {
             "serverSide": true,
             "bSort": false,
             "ajax": {
-                "url": "list",
+                "url": getBaseUrl() + "multimedia/images/list",
                 "data": function (requestDataModifiedGET) {
                     delete requestDataModifiedGET.columns;
                     delete requestDataModifiedGET.order;
@@ -1022,15 +1243,12 @@ var ImageWriter = {
                     "data": null,
                     "class": "text-center",
                     "defaultContent": '<div class="dropdown"> ' +
-                    '<button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                    'Действия' +
-                    '<span class="caret"></span> ' +
-                    '</button> ' +
-                    '<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"> ' +
+                    '<button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true"' +
+                    ' aria-expanded="false">' + 'Действия' + '<span class="caret"></span> ' +
+                    '</button> <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"> ' +
                     '<li role="presentation" ><a id="crop"><i class="fa fa-cut"></i> Нарезать фото</a></li>' +
-                    '<li role="presentation" ><a id="edit"><i class="fa fa-pencil"></i> Редактировать описание</a></li>' +
-                    '</ul> ' +
-                    '</div>'
+                    '<li role="presentation" ><a id="edit"><i class="fa fa-pencil">' +
+                    '</i> Редактировать описание</a></li></ul> </div>'
                 }
             ]
         }
@@ -1059,7 +1277,9 @@ var ImageWriter = {
             ImageWriter.table.api().row($(this).parents('tr')).data().id);
         });
 
-        $('#images tbody').on('click', '#show_images',function(){
+        $('#images tbody').on('click', '#show_images', function () {
+            $('#preview-list').empty();
+            ImageWriter.setCroppedImages(ImageWriter.table.api().row($(this).parents('tr')).data().id);
             $('#croppedImagesShow').modal('show');
         });
 
@@ -1072,8 +1292,33 @@ var ImageWriter = {
         this.table.api().ajax.reload();
 
     },
-    insetCropedImaged: function(){
-
+    setCroppedImages: function (imageId) {
+        $.ajax({
+            type: "POST",
+            url: getBaseUrl() + 'multimedia/images/preview/' + imageId,
+            dataType: "json",
+            beforeSend: function () {
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
+            },
+            complete: function () {
+                $('#loading').modal('hide');
+            },
+            success: function (json) {
+                $.each(json.data.data, function (k, v) {
+                    $('#preview-list').append(
+                        '<div class="well" style="margin-top: 3px; margin-right: 4px" > ' + '<blockquote>' +
+                        '<h4>' + v.title + '</h4> ' + '<strong>' + $().technomedia.width + ':' + v.width + 'px ' +
+                        $().technomedia.height + ':' + v.height + 'px' + '</strong>' + '</blockquote>' +
+                        '<img src="' + getBaseUrl() + 'images/upload/' + v.path + '" class="img-responsive' +
+                        ' preview-container" alt="Responsive image"> ' +
+                        '</div>'
+                    );
+                })
+            }
+        });
     },
     saveDialog: function (message) {
         noty({
@@ -1110,7 +1355,6 @@ var ImageWriter = {
             w: $('#w').val(),
             h: $('#h').val()
         }, function (json) {
-            console.log(json);
             if (json.success) {
                 ImageWriter.setMessageTpl($().technomedia.saveCropImagesOkMessage)
             } else {
@@ -1200,7 +1444,6 @@ var ImageCrop = {
     api: null,
     boundx: null,
     boundy: null,
-
     preview: $('#preview-pane'),
     pcnt: $('.preview-container'),
     pimg: $('.preview-container img'),
@@ -1236,6 +1479,140 @@ var ImageCrop = {
         $('#y').val(c.y);
         $('#w').val(c.w);
         $('#h').val(c.h);
+    }
+};
+
+var InsertImagesPlugin = {
+    table: null,
+    init: function () {
+        if (this.table === null) {
+            this.table = $('#insert-images-materials')
+                .on('xhr.dt', function (e, settings, json) {
+                    for (var i = 0, ien = json.data.length; i < ien; i++) {
+                        json.data[i].ico_file = '<img id="image_search" class="img-thumbnail center-block"' +
+                        ' data-holder-rendered="true" src="' + getBaseUrl() + 'images/upload/' + json.data[i].ico_file +
+                        '" style=" display: block;max-width: 30%; max-height: 30%;" alt="140x140">';
+
+                        if (json.data[i].count_cropped > 0)
+                            json.data[i].count_cropped = '<strong>' + json.data[i].count_cropped +
+                            '</strong>&nbsp;<button class="btn btn-default btn-circle" id="show_images"' +
+                            ' type="button"> <i class="fa fa-paste"></i></button>';
+                    }
+                    // Тут возомжно придется менять адресса изображений а именно путь до них тут нужно
+                    // будет думать
+                }).
+                on('draw.dt', function () {
+                    $('.img-thumbnail').each(function () {
+                        $(this).hover(
+                            function () {
+                                $(this).stop().animate({
+                                    "max-width": "100%",
+                                    display: "block",
+                                    "max-height": "100%"
+                                }, 2);
+                            },
+                            function () {
+                                $(this).stop().animate({"max-width": "30%", display: "block", "max-height": "30%"}, 2);
+                            }
+                        )
+                    })
+                }).
+                dataTable(
+                {
+                    "language": {
+                        "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"
+                    },
+                    "bFilter": false,
+                    "processing": true,
+                    "serverSide": true,
+                    "bSort": false,
+                    "ajax": {
+                        "url": getBaseUrl() + "multimedia/images/list",
+                        "data": function (requestDataModifiedGET) {
+                            delete requestDataModifiedGET.columns;
+                            delete requestDataModifiedGET.order;
+                            requestDataModifiedGET.title = $('#title-image-insert').val();
+                            requestDataModifiedGET.description = $('#description-image-insert').val();
+                            requestDataModifiedGET.tags = $('#tags-image-insert').val();
+                            requestDataModifiedGET.of_uploaded_at = $('#of_uploaded_at-image-insert').val();
+                            requestDataModifiedGET.to_uploaded_at = $('#to_uploaded_at-image-insert').val();
+                        }
+                    },
+                    "columns": [
+                        {"data": "id"},
+                        {"data": "title"},
+                        {"data": "description"},
+                        {"data": "ico_file"},
+                        {"data": "uploaded_at"},
+                        {
+                            "data": "count_cropped",
+                            "class": "text-center"
+                        }
+                    ]
+                }
+            )
+        } else {
+            this.reloadTable();
+        }
+
+        $('#insert-images-materials tbody').on('click', '#show_images', function () {
+            $('#preview-list').empty();
+            InsertImagesPlugin.setCroppedImages(InsertImagesPlugin.table.api().row($(this).parents('tr')).data().id);
+            $('#inserting-images-preview').modal('show');
+        });
+
+        $('#search_image-image-insert').click(function () {
+            InsertImagesPlugin.reloadTable();
+        });
+
+        $('#preview_ico').click(function () {
+            $('#show_image').attr('src', $('#image-ico').val());
+            $('#inserting-show-image').modal('show')
+        });
+
+        //$('#preview-list').on('click', '#insert_image', function () {
+        //    var img = $($(this).parent()).children('img');
+        //    $('#image-ico').empty().val($(img).attr('src'));
+        //    $('#inserting-images-preview').modal('hide');
+        //})
+
+    },
+    setCroppedImages: function (imageId) {
+        $.ajax({
+            type: "POST",
+            url: getBaseUrl() + 'multimedia/images/preview/' + imageId,
+            dataType: "json",
+            beforeSend: function () {
+                $('#loading').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
+            },
+            complete: function () {
+                $('#loading').modal('hide');
+            },
+            success: function (json) {
+                $.each(json.data.data, function (k, v) {
+
+                    $('#preview-list').append(
+                        '<div class="well" style="margin-top: 3px; margin-right: 4px" > ' + '<blockquote>' +
+                        '<h4>' + v.title + '</h4> ' + '<strong>' + $().technomedia.width + ':' + v.width + 'px ' +
+                        $().technomedia.height + ':' + v.height + 'px' + '</strong>' + '</blockquote>' +
+                        '<img src="' + getBaseUrl() + 'images/upload/' + v.path +
+                        '" class="img-responsive preview-container" alt="Responsive image"> ' +
+                        ' <button class="btn  btn-success" id="insert_image" type="button">Вставить </button>' +
+                        '</div>'
+                    );
+                })
+            }
+        });
+    },
+    reloadTable: function () {
+        this.table.api().ajax.reload();
+    },
+    insert: function (e) {
+        InsertImagesPlugin.init();
+        $('#insert_images_in_materials').modal('show');
     }
 };
 

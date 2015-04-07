@@ -389,6 +389,15 @@ RouterRewrite::me()
                     'imageId' => null
                 ]
             )
+    ) ->addRoute(
+        'probe',
+        RouterTransparentRule::create('/probe')
+            ->setDefaults(
+                [
+                    'area' => 'Probe',
+                    'action' => 'index'
+                ]
+            )
     )
 
 //    ->addRoute(

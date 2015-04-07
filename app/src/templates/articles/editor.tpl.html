@@ -14,7 +14,7 @@
                     <i class="fa fa-bars fa-fw"></i>
                     Статья
                 </div>
-                <form id="article" method="post">
+                <form id="article" method="post" role="form">
                     <div class="panel-body">
                         <input hidden="" name="articleId" id="articleId">
 
@@ -75,6 +75,41 @@
                         </div>
                         <div class="form-group">
                             <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Иконка"> Первью для статьи (Изображение)
+                            </label>
+
+                            <div class="form-group input-group">
+                                <input type="text" class="form-control input-sm" id="ico" disabled=""/>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" id="preview-image" type="button"><i
+                                                        class="fa fa-search"></i>
+                                                </button>
+                                                <button class="btn" id="insert-img" type="button">
+                                                    <i class="fa fa-photo"></i>
+                                                </button>
+                                            </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
+                                   title="Сюжет"> Превью для сюжета (Изображение)
+                            </label>
+
+                            <div class="form-group input-group">
+                                <input type="text" class="form-control input-sm" id="top" disabled=""/>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" id="preview-image" type="button"><i
+                                                        class="fa fa-search"></i>
+                                                </button>
+                                                <button class="btn" id="insert-img" type="button">
+                                                    <i class="fa fa-photo"></i>
+                                                </button>
+                                            </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" data-toggle="tooltip" data-placement="top"
                                    title="Автор статьи"> Автор статьи</label>
                             <input type="text" name="author" id="author" class="form-control" placeholder="Автор статьи"
                                    required>
@@ -101,6 +136,10 @@
             </div>
         </div>
     </div>
+<?php $partViewer->view('html-helper/upload-and-paste-images-in-materials') ?>
+<?php $partViewer->view('html-helper/inserting-images-in-materials') ?>
+<?php $partViewer->view('html-helper/inserting-images-preview') ?>
+<?php $partViewer->view('html-helper/inserting-show-image') ?>
 <?php $partViewer->view('html-helper/select-rubric'); ?>
 <?php $partViewer->view('html-helper/loader'); ?>
 <?php $partViewer->view('layouts/footer'); ?>

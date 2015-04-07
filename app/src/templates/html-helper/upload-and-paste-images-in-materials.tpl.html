@@ -1,0 +1,45 @@
+<div class="modal fade"
+     id="upload-and-paste-images-in-materials" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content modal-lg" style="width: 610px; height: 330px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Загрузить/Вставить изображение</h4>
+            </div>
+            <div id="selected-rubric-message">
+            </div>
+            <div class="modal-body">
+                <form id="upload-images-file">
+
+                    <div class="form-group">
+                        <label>Выбрать изображение</label>
+                        <input type="file">
+                        <button class="btn btn-bitbucket" style="margin-top: 10px">Загрузить/Получить ссылку</button>
+                    </div>
+                    <fieldset>
+                        <div class="form-group">
+                            <input id="url-image" class="form-control" type="text" value="" placeholder="URL">
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6">
+                                        <input id="width" class="form-control" placeholder="Ширина: 100px">
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6">
+                                        <input id="height" class="form-control" placeholder="Высота: 100px">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success">Вставить</button>
+            </div>
+        </div>
+    </div>
+</div>

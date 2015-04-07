@@ -36,7 +36,6 @@ setlocale(LC_TIME, "ru_RU.UTF8");
 
 
 
-//var_dump(PATH_PLATFORM_CLASSES);die;
 
 
 Logger::me()

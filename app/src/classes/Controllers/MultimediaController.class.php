@@ -97,64 +97,76 @@ class MultimediaController extends ProjectAuthMappedController
      */
     public function uploadImageAction(HttpRequest $request)
     {
+
         $responseView = ProjectResponseView::create();
         $moduleRequest = ModuleMultimediaAddImageOperationRequest::create();
 
-        $this->setForm(
-            $this
-                ->getValidatedFormUploadedFileTextField()
-                ->import($request->getPost())
-        );
+        try {
+            $this->setForm(
+                $this
+                    ->getValidatedFormUploadedFileTextField()
+                    ->import($request->getPost())
+            );
 
-        if ($this->getForm()->getError('name')) {
-            $responseView->setError('name', $this->getForm()->getTextualErrorFor('name'));
-        } else {
-            $moduleRequest->setName($this->transliterate($this->getForm()->get('name')->getValue()));
-            $moduleRequest->setTitle($this->getForm()->get('name')->getValue());
-        }
+            if ($this->getForm()->getError('name')) {
+                $responseView->setError('name', $this->getForm()->getTextualErrorFor('name'));
+            } else {
+                $moduleRequest->setName($this->transliterate($this->getForm()->get('name')->getValue()));
+                $moduleRequest->setTitle($this->getForm()->get('name')->getValue());
+            }
 
-        if ($this->getForm()->getError('description'))
-            $responseView->setError('description', $this->getForm()->getTextualErrorFor('description'));
-        else
-            $moduleRequest->setDescription($this->getForm()->get('description')->getValue());
+            if ($this->getForm()->getError('description'))
+                $responseView->setError('description', $this->getForm()->getTextualErrorFor('description'));
+            else
+                $moduleRequest->setDescription($this->getForm()->get('description')->getValue());
 
-        if ($this->getForm()->getError('tags'))
-            $responseView->setError('tags', $this->getForm()->getTextualErrorFor('tags'));
-        else
-            $moduleRequest->setTags($this->getForm()->get('tags')->getValue());
+            if ($this->getForm()->getError('tags'))
+                $responseView->setError('tags', $this->getForm()->getTextualErrorFor('tags'));
+            else
+                $moduleRequest->setTags($this->getForm()->get('tags')->getValue());
 
-        $this->setForm(
-            $this
-                ->getValidatedFormUploadedFile()
-                ->import($request->getFiles())
-        );
+            $this->setForm(
+                $this
+                    ->getValidatedFormUploadedFile()
+                    ->import($request->getFiles())
+            );
 
-        if ($this->getForm()->getError('image'))
-            $responseView->setError('image', $this->getForm()->getTextualErrorFor('image'));
-        else
-            $moduleRequest->setImages($this->getForm()->get('image')->getRawValue());
+            if ($this->getForm()->getError('image'))
+                $responseView->setError('image', $this->getForm()->getTextualErrorFor('image'));
+            else
+                $moduleRequest->setImages($this->getForm()->get('image')->getRawValue());
 
-        if (!empty($responseView->getError()))
+            if (!empty($responseView->getError()))
+                return $this->getModelAndView(
+                    $responseView
+                        ->setSuccess(FALSE)
+                        ->setTpl('multimedia/image-editor')
+                );
+
+            $this->getModule()->getModuleObject()->setRequest(
+                $moduleRequest
+            );
+
+            $this->getModule()->init(MultimediaOperationEnum::addImage());
+
+            /** @var  ModuleMultimediaAddImageOperationResponse $response */
+            $response = $this->getModule()->getModuleObject()->getResponse();
+
             return $this->getModelAndView(
                 $responseView
+                    ->setSuccess(TRUE)
+                    ->setData('ico', $response->getIcoPath())
+            );
+        } catch (BaseException $e) {
+            Logger::me()->exception($e);
+
+            return $this->getModelAndView(
+                $responseView
+                    ->setError('image', 'Error service!!!')
                     ->setSuccess(FALSE)
                     ->setTpl('multimedia/image-editor')
             );
-
-        $this->getModule()->getModuleObject()->setRequest(
-            $moduleRequest
-        );
-
-        $this->getModule()->init(MultimediaOperationEnum::addImage());
-
-        /** @var  ModuleMultimediaAddImageOperationResponse $response */
-        $response = $this->getModule()->getModuleObject()->getResponse();
-
-        return $this->getModelAndView(
-            $responseView
-                ->setSuccess(TRUE)
-                ->setData('ico', $response->getIcoPath())
-        );
+        }
     }
 
     /**
@@ -267,14 +279,44 @@ class MultimediaController extends ProjectAuthMappedController
                 ProjectResponseView::create()
                     ->setSuccess(TRUE)
             );
-        }catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Logger::me()->exception($e);
             return $this->getModelAndView(
                 ProjectResponseView::create()->setSuccess(FALSE)
             );
         }
     }
+
+    public function getPreviewAction(HttpRequest $request)
+    {
+        try {
+            $this->getModule()->getModuleObject()->setRequest(
+                ModuleMultimediaGetPreviewListRequest::create()
+                    ->setId(
+                        $request->getAttachedVar('imageId')
+                    )
+            );
+
+            $this->getModule()->init(MultimediaOperationEnum::getPreview());
+
+            /** @var ModuleMultimediaGetPreviewListResponse $response */
+            $response = $this->getModule()->getModuleObject()->getResponse();
+
+            return $this->getModelAndView(
+                ProjectResponseView::create()
+                    ->setData('data', $response->getData())
+                    ->setSuccess(true)
+            );
+        } catch (Exception $e) {
+            Logger::me()->exception($e);
+
+            return $this->getModelAndView(
+                ProjectResponseView::create()
+                    ->setSuccess(false)
+            );
+        }
+    }
+
 
     /**
      * @return Form
@@ -296,7 +338,6 @@ class MultimediaController extends ProjectAuthMappedController
      */
     protected function getValidatedFormUploadedFileTextField()
     {
-
         return Form::create()
             ->set(Primitive::string('name')->required())
             ->addMissingLabel('name', PlatformFileUploadMessageEnum::getErrorRequiredName()->getName())
@@ -328,6 +369,7 @@ class MultimediaController extends ProjectAuthMappedController
      */
     protected function getValidatedCropImagesForm()
     {
+
         return Form::create()
             ->add(Primitive::float('x')->required())
             ->add(Primitive::float('y')->required())
@@ -336,7 +378,6 @@ class MultimediaController extends ProjectAuthMappedController
             ->add(Primitive::integer('imagesSizeId')->required())
             ->add(Primitive::integer('imagesId')->required());
     }
-
 
     /**
      * @param $array
@@ -375,7 +416,8 @@ class MultimediaController extends ProjectAuthMappedController
             'images' => 'imagesAction',
             'imagesList' => 'imagesListAction',
             'crop' => 'cropAction',
-            'cropImage' => 'cropImageAction'
+            'cropImage' => 'cropImageAction',
+            'getPreview' => 'getPreviewAction'
         ];
     }
 }

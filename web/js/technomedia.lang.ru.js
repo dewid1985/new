@@ -29,5 +29,7 @@ $.fn.technomedia = {
     addCropImagesMessage:['Вы действительно хотите, сохранить выделенную область изображения?'],
     saveCropImagesOkMessage:['Изображение успешно сохраненно'],
     btnNext: ['Продолжить'],
-    btnList: ['Список']
+    btnList: ['Список'],
+    width: ['Ширина'],
+    height: ['Высота']
 };
